@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#16A34A"/>
+  <path d="M256 120 L376 200 L376 260 Q376 360 256 400 Q136 360 136 260 L136 200 Z" fill="#fff" opacity="0.15"/>
+  <text x="256" y="300" font-family="Inter, sans-serif" font-size="200" font-weight="800" text-anchor="middle" fill="#fff">F</text>
+</svg>

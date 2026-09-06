@@ -26,6 +26,24 @@ export default defineConfig({
         orientation: 'any',
         start_url: './',
         scope: './',
+        screenshots: [
+          {
+            src: 'screenshot-dashboard.png',
+            sizes: '941x1672',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: 'Painel financeiro do FinEdu Wallet',
+          },
+        ],
+        shortcuts: [
+          {
+            name: 'Abrir painel',
+            short_name: 'Painel',
+            description: 'Abrir o painel financeiro do FinEdu Wallet',
+            url: './',
+            icons: [{ src: 'icon-192.png', sizes: '192x192', type: 'image/png' }],
+          },
+        ],
         icons: [
           {
             src: 'icon-192.png',

@@ -139,15 +139,18 @@ Para publicar na loja, prefira uma hospedagem HTTPS com URL permanente. Túneis 
 
 ## Publicar no GitHub Pages e gerar o APK
 
-O comando `npm run build` gera o `manifest.webmanifest`, os icones e o service worker. A configuracao usa caminhos relativos para funcionar na URL de projeto do GitHub Pages.
+O comando `npm run build` gera o `manifest.json`, os icones e o service worker. A configuracao usa caminhos relativos para funcionar na URL de projeto do GitHub Pages.
 
 1. Envie este projeto para um repositorio GitHub na branch `main`.
 2. No GitHub, abra **Settings > Pages** e selecione **GitHub Actions** em Build and deployment.
    Essa ativacao deve ser feita uma vez pelo dono do repositorio. O `GITHUB_TOKEN` do workflow nao tem permissao para habilitar Pages automaticamente.
 3. Faca push na branch `main`. O workflow `.github/workflows/deploy-pages.yml` publicara a pasta `dist`.
+   Confirme no arquivo publicado no GitHub que ele usa `actions/configure-pages@v6`. Uma execucao que mostra `@v5` ainda esta usando uma versao antiga do workflow.
 4. Ao terminar, a URL sera parecida com `https://SEU-USUARIO.github.io/NOME-DO-REPOSITORIO/`.
 5. Abra essa URL e verifique se o aplicativo carrega.
 6. Cole essa URL publica do GitHub Pages no [PWABuilder](https://www.pwabuilder.com/) e escolha Android para gerar APK ou AAB.
 
 O PWABuilder precisa da URL publica do GitHub Pages. A URL do repositorio, como `github.com/usuario/repositorio`, nao pode ser usada para gerar o APK.
+
+O arquivo `manifest.json` na raiz e a versao pronta para copiar ou enviar ao PWABuilder. Ao publicar pelo projeto, `npm run build` gera a mesma configuracao em `dist/manifest.json`.
 "# TCC" 

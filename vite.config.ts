@@ -10,12 +10,17 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      manifestFilename: 'manifest.json',
       includeAssets: ['favicon.svg'],
       manifest: {
         id: './',
         lang: 'pt-BR',
         dir: 'ltr',
         categories: ['finance', 'productivity', 'education'],
+        prefer_related_applications: false,
+        launch_handler: {
+          client_mode: 'navigate-existing',
+        },
         name: 'FinEdu Wallet',
         short_name: 'FinEdu',
         description: 'Seu personal trainer financeiro. Entenda seu dinheiro, crie melhores hábitos, evolua financeiramente.',

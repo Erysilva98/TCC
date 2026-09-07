@@ -50,7 +50,7 @@ export function Profile() {
   function handleReset() {
     if (confirm('Tem certeza? Todos os dados serão apagados permanentemente.')) {
       resetApp();
-      window.location.href = '/';
+      window.location.hash = '#/';
     }
   }
 

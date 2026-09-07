@@ -147,10 +147,13 @@ O comando `npm run build` gera o `manifest.json`, os icones e o service worker. 
 3. Faca push na branch `main`. O workflow `.github/workflows/deploy-pages.yml` publicara a pasta `dist`.
    Confirme no arquivo publicado no GitHub que ele usa `actions/configure-pages@v6`. Uma execucao que mostra `@v5` ainda esta usando uma versao antiga do workflow.
 4. Ao terminar, a URL sera parecida com `https://SEU-USUARIO.github.io/NOME-DO-REPOSITORIO/`.
+   Para este repositorio (`Erysilva98/TCC`), use `https://erysilva98.github.io/TCC/`.
 5. Abra essa URL e verifique se o aplicativo carrega.
 6. Cole essa URL publica do GitHub Pages no [PWABuilder](https://www.pwabuilder.com/) e escolha Android para gerar APK ou AAB.
 
 O PWABuilder precisa da URL publica do GitHub Pages. A URL do repositorio, como `github.com/usuario/repositorio`, nao pode ser usada para gerar o APK.
 
 `vite.config.ts` e a unica fonte de configuracao do manifesto. Ao executar `npm run build`, ele gera `dist/manifest.json`, que e o unico manifesto publicado e lido pelo PWABuilder.
+
+A pasta `dist` permanece no `.gitignore` de proposito. O workflow do GitHub Actions executa o build no servidor e publica o conteudo de `dist` como artefato do GitHub Pages; portanto, nao envie `dist` ao Git manualmente.
 "# TCC" 

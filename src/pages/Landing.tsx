@@ -1,12 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Wallet, TrendingUp, GraduationCap, ArrowRight } from 'lucide-react';
+import { PWAInstallButton } from '@/components/ui/PWAInstallButton';
 
 export function Landing() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary-50 via-white to-white flex flex-col">
+    <div className="relative min-h-screen bg-gradient-to-b from-primary-50 via-white to-white flex flex-col">
+      <div className="absolute right-4 top-4 z-30">
+        <PWAInstallButton />
+      </div>
       <div className="flex-1 flex flex-col items-center justify-center px-6 max-w-md mx-auto">
         <motion.div
           initial={{ scale: 0, rotate: -20 }}

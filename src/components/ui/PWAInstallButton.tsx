@@ -7,29 +7,50 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+let savedInstallPrompt: BeforeInstallPromptEvent | null = null;
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    savedInstallPrompt = event as BeforeInstallPromptEvent;
+    window.dispatchEvent(new Event('pwa-install-available'));
+  });
+
+  window.addEventListener('appinstalled', () => {
+    savedInstallPrompt = null;
+    window.dispatchEvent(new Event('pwa-installed'));
+  });
+}
+
 export function PWAInstallButton() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(savedInstallPrompt);
   const [showBanner, setShowBanner] = useState(false);
   const [installed, setInstalled] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
 
   useEffect(() => {
-    const handler = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setShowBanner(true);
+    const handleAvailable = () => {
+      setDeferredPrompt(savedInstallPrompt);
+      if (!localStorage.getItem('pwa-banner-dismissed')) {
+        setShowBanner(true);
+      }
     };
-    window.addEventListener('beforeinstallprompt', handler);
-    window.addEventListener('appinstalled', () => {
+
+    const handleInstalled = () => {
       setInstalled(true);
       setShowBanner(false);
-    });
+    };
 
-    const dismissed = localStorage.getItem('pwa-banner-dismissed');
-    if (dismissed) setShowBanner(false);
+    if (savedInstallPrompt && !localStorage.getItem('pwa-banner-dismissed')) {
+      setShowBanner(true);
+    }
+
+    window.addEventListener('pwa-install-available', handleAvailable);
+    window.addEventListener('pwa-installed', handleInstalled);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener('pwa-install-available', handleAvailable);
+      window.removeEventListener('pwa-installed', handleInstalled);
     };
   }, []);
 
@@ -44,6 +65,7 @@ export function PWAInstallButton() {
       setInstalled(true);
     }
     setDeferredPrompt(null);
+    savedInstallPrompt = null;
     setShowBanner(false);
   }
 

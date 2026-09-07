@@ -152,5 +152,5 @@ O comando `npm run build` gera o `manifest.json`, os icones e o service worker. 
 
 O PWABuilder precisa da URL publica do GitHub Pages. A URL do repositorio, como `github.com/usuario/repositorio`, nao pode ser usada para gerar o APK.
 
-O arquivo `manifest.json` na raiz e a versao pronta para copiar ou enviar ao PWABuilder. Ao publicar pelo projeto, `npm run build` gera a mesma configuracao em `dist/manifest.json`.
+`vite.config.ts` e a unica fonte de configuracao do manifesto. Ao executar `npm run build`, ele gera `dist/manifest.json`, que e o unico manifesto publicado e lido pelo PWABuilder.
 "# TCC" 

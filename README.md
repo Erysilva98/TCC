@@ -143,6 +143,7 @@ O comando `npm run build` gera o `manifest.webmanifest`, os icones e o service w
 
 1. Envie este projeto para um repositorio GitHub na branch `main`.
 2. No GitHub, abra **Settings > Pages** e selecione **GitHub Actions** em Build and deployment.
+   Essa ativacao deve ser feita uma vez pelo dono do repositorio. O `GITHUB_TOKEN` do workflow nao tem permissao para habilitar Pages automaticamente.
 3. Faca push na branch `main`. O workflow `.github/workflows/deploy-pages.yml` publicara a pasta `dist`.
 4. Ao terminar, a URL sera parecida com `https://SEU-USUARIO.github.io/NOME-DO-REPOSITORIO/`.
 5. Abra essa URL e verifique se o aplicativo carrega.

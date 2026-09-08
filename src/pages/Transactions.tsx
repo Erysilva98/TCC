@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Search, Filter } from 'lucide-react';
 import { Layout } from '@/components/ui/Layout';
@@ -16,8 +17,14 @@ export function Transactions() {
   const [showAdd, setShowAdd] = useState(false);
   const [filter, setFilter] = useState<'all' | 'receita' | 'despesa'>('all');
   const [search, setSearch] = useState('');
+  const location = useLocation();
   const transactions = useStore((s) => s.transactions);
   const deleteTransaction = useStore((s) => s.deleteTransaction);
+
+  useEffect(() => {
+    const requestedFilter = (location.state as { filter?: 'receita' | 'despesa' } | null)?.filter;
+    if (requestedFilter) setFilter(requestedFilter);
+  }, [location.state]);
 
   const filtered = useMemo(() => {
     return transactions.filter((t) => {

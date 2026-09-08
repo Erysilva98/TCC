@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
 } from 'recharts';
 import {
   TrendingUp, TrendingDown, Lightbulb, AlertTriangle, CheckCircle,
-  Target, Settings2, ArrowUpRight, ArrowDownRight,
+  Target, Settings2,
   Wallet, PiggyBank, Activity, Landmark, CreditCard, Coins,
 } from 'lucide-react';
 import { Layout } from '@/components/ui/Layout';
@@ -124,7 +124,12 @@ export function Dashboard() {
               className="bg-white rounded-2xl shadow-card p-4"
             >
               {cardId === 'saldo' && (
-                <SaldoTotalCard saldo={saldoTotal} icon={Icon} editing={editingCards} onToggle={() => {}} canEdit={false} />
+                <SaldoTotalCard
+                  saldo={saldoTotal}
+                  accounts={accounts}
+                  investments={assets.filter((a) => a.tipo === 'investimento')}
+                  icon={Icon}
+                />
               )}
               {cardId === 'contas' && (accounts.length > 0 || totalInvestimentos > 0) && (
                 <ContasCard
@@ -150,6 +155,7 @@ export function Dashboard() {
                   onMoveUp={() => moveCard(index, -1)}
                   onMoveDown={() => moveCard(index, 1)}
                   canEdit={true}
+                  onNavigate={(filter) => navigate('/gastos', { state: { filter } })}
                 />
               )}
               {cardId === 'gastos_categoria' && (
@@ -258,41 +264,75 @@ function CardShell({ icon: Icon, title, editing, onToggle, onMoveUp, onMoveDown,
   );
 }
 
-function SaldoTotalCard({ saldo, icon: Icon, editing, onToggle, canEdit }: { saldo: number; icon: LucideIcon; editing: boolean; onToggle: () => void; canEdit: boolean }) {
-  const isPositive = saldo >= 0;
+function SaldoTotalCard({ saldo, accounts, investments, icon: Icon }: { saldo: number; accounts: Account[]; investments: Asset[]; icon: LucideIcon }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const items = [
+    ...accounts.map((account) => ({
+      id: account.id,
+      nome: account.nome,
+      tipo: account.tipo === 'cartao' ? 'Cartão' : 'Conta',
+      valor: account.saldo,
+      cor: account.cor,
+      icon: account.tipo === 'cartao' ? Icons.CreditCard : Icons.Landmark,
+    })),
+    ...investments.map((investment) => ({
+      id: investment.id,
+      nome: investment.nome,
+      tipo: 'Investimento',
+      valor: investment.valor,
+      cor: '#16a34a',
+      icon: Icons.TrendingUp,
+    })),
+  ];
+  const hasItems = items.length > 0;
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
             <Icon className="w-5 h-5 text-primary-600" />
           </div>
-          <div>
-            <h2 className="font-bold text-ink-900 text-sm">Saldo Total</h2>
-            <p className="text-xs text-ink-400">Contas + investimentos</p>
-          </div>
+          <h2 className="font-bold text-ink-900 text-sm">Saldo Total</h2>
         </div>
-        <div className="chip text-xs bg-primary-50 text-primary-700">Fixo</div>
+        {hasItems && (
+          <button type="button" onClick={() => setIsExpanded((expanded) => !expanded)} className="p-2 -mr-2 text-ink-500 hover:text-primary-600 transition-colors" aria-expanded={isExpanded} aria-label={isExpanded ? 'Ocultar detalhamento do saldo' : 'Mostrar detalhamento do saldo'}>
+            {isExpanded ? <Icons.ChevronUp className="w-5 h-5" /> : <Icons.ChevronDown className="w-5 h-5" />}
+          </button>
+        )}
       </div>
       <motion.div
         key={saldo}
         initial={{ scale: 0.95, opacity: 0.5 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className={`text-3xl font-extrabold ${isPositive ? 'text-ink-900' : 'text-danger'}`}
+        className={`mt-3 text-3xl font-extrabold ${saldo >= 0 ? 'text-ink-900' : 'text-danger'}`}
       >
         {formatCurrency(saldo)}
       </motion.div>
-      <div className="flex items-center gap-1 mt-2">
-        {isPositive ? (
-          <ArrowUpRight className="w-4 h-4 text-primary-600" />
-        ) : (
-          <ArrowDownRight className="w-4 h-4 text-danger" />
+      <AnimatePresence initial={false}>
+        {isExpanded && hasItems && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
+            <div className="mt-4 pt-4 border-t border-ink-100 space-y-2">
+              <p className="text-[10px] font-semibold tracking-wide text-ink-400">DETALHAMENTO</p>
+              {items.map((item) => {
+                const ItemIcon = item.icon;
+                return (
+                  <div key={item.id} className="flex items-center gap-3 p-2.5 bg-ink-50 rounded-xl">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: item.cor + '20' }}>
+                      <ItemIcon className="w-4 h-4" style={{ color: item.cor }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-ink-900 truncate">{item.nome}</p>
+                      <p className="text-[10px] text-ink-400">{item.tipo}</p>
+                    </div>
+                    <span className="text-sm font-bold text-ink-900">{formatCurrency(item.valor)}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
         )}
-        <span className="text-xs text-ink-500">
-          {isPositive ? 'Saldo positivo' : 'Saldo negativo'}
-        </span>
-      </div>
+      </AnimatePresence>
     </div>
   );
 }
@@ -355,24 +395,24 @@ function ContasCard(props: {
   );
 }
 
-function EntradasSaidasCard(props: { receitas: number; despesas: number; mesNome: string; icon: LucideIcon; title: string; editing: boolean; onToggle: () => void; onMoveUp?: () => void; onMoveDown?: () => void; canEdit: boolean }) {
+function EntradasSaidasCard(props: { receitas: number; despesas: number; mesNome: string; icon: LucideIcon; title: string; editing: boolean; onToggle: () => void; onMoveUp?: () => void; onMoveDown?: () => void; canEdit: boolean; onNavigate: (filter: 'receita' | 'despesa') => void }) {
   return (
     <CardShell icon={props.icon} title={`${props.mesNome} — Entradas x Saídas`} editing={props.editing} onToggle={props.onToggle} onMoveUp={props.onMoveUp} onMoveDown={props.onMoveDown} canEdit={props.canEdit}>
       <div className="grid grid-cols-2 gap-3">
-        <div className="p-3 bg-primary-50 rounded-xl">
+        <button type="button" onClick={() => props.onNavigate('receita')} className="p-3 bg-primary-50 rounded-xl text-left transition-colors hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-300">
           <div className="flex items-center gap-1.5 mb-1">
             <TrendingUp className="w-4 h-4 text-primary-600" />
             <span className="text-xs font-medium text-primary-700">Entradas</span>
           </div>
           <p className="text-lg font-bold text-primary-700">{formatCurrency(props.receitas)}</p>
-        </div>
-        <div className="p-3 bg-red-50 rounded-xl">
+        </button>
+        <button type="button" onClick={() => props.onNavigate('despesa')} className="p-3 bg-red-50 rounded-xl text-left transition-colors hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-200">
           <div className="flex items-center gap-1.5 mb-1">
             <TrendingDown className="w-4 h-4 text-danger" />
             <span className="text-xs font-medium text-danger">Saídas</span>
           </div>
           <p className="text-lg font-bold text-danger">{formatCurrency(props.despesas)}</p>
-        </div>
+        </button>
       </div>
     </CardShell>
   );
@@ -410,7 +450,10 @@ function GastosCategoriaCard(props: { data: { name: string; value: number; color
             <div key={d.name} className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
               <span className="text-xs text-ink-700 flex-1 truncate">{d.name}</span>
-              <span className="text-xs font-semibold text-ink-900">{Math.round((d.value / total) * 100)}%</span>
+              <div className="text-right shrink-0 leading-tight">
+                <p className="text-xs font-semibold text-ink-900">{Math.round((d.value / total) * 100)}%</p>
+                <p className="text-[10px] text-ink-500">{formatCurrency(d.value)}</p>
+              </div>
             </div>
           ))}
         </div>

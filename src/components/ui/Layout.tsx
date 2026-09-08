@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { BottomNav } from './BottomNav';
-import { PWAInstallButton } from './PWAInstallButton';
 import { useStore } from '@/store/useStore';
 import { PROFILES } from '@/data/profiles';
 import * as Icons from 'lucide-react';
@@ -36,7 +35,6 @@ export function Layout({ children, title, showHeader = true, showNav = true }: L
               <span className="font-bold text-ink-900 text-sm">FinEdu Wallet</span>
             </div>
             <div className="flex items-center gap-2">
-              <PWAInstallButton />
               {profileConfig && (
                 <div
                   className="chip text-xs"

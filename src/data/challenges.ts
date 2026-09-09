@@ -25,6 +25,7 @@ const CHALLENGE_TEMPLATES: ChallengeTemplate[] = [
   { id: 'est_rel', titulo: 'Analisar relatório', descricao: 'Acesse a página de análises e revise seu relatório mensal.', xp: 50, perfil: 'estrategista' },
   { id: 'est_pat', titulo: 'Atualizar patrimônio', descricao: 'Cadastre ou atualize seus itens de patrimônio.', xp: 50, perfil: 'estrategista' },
   { id: 'est_otm', titulo: 'Otimizar gastos', descricao: 'Identifique e reduza uma despesa recorrente.', xp: 50, perfil: 'estrategista' },
+  { id: 'est_mestre_teste', titulo: 'Teste: desbloquear Mestre Financeiro', descricao: 'Conclua este desafio de teste para avançar ao perfil dourado.', xp: 10000, perfil: 'estrategista' },
 ];
 
 export function generateChallengesForProfile(profile: ProfileType, monthKey: string): Challenge[] {

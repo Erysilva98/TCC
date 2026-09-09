@@ -1,4 +1,4 @@
-export type ProfileType = 'explorer' | 'equilibrado' | 'construtor' | 'estrategista';
+export type ProfileType = 'explorer' | 'equilibrado' | 'construtor' | 'estrategista' | 'mestre';
 
 export type TransactionType = 'receita' | 'despesa';
 
@@ -66,6 +66,7 @@ export interface OnboardingState {
   completed: boolean;
   score: number;
   profile: ProfileType | null;
+  initialProfile?: ProfileType | null;
 }
 
 export interface Budget {

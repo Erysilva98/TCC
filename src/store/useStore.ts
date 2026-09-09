@@ -1,17 +1,18 @@
 import { create } from 'zustand';
 import type {
   AppState, Transaction, Goal, Account, Asset, Challenge,
-  ProfileType, Budget, LessonProgress, CategoryId, Transfer,
+  ProfileType, Budget, LessonProgress, CategoryId, Transfer, OnboardingState,
 } from '@/types';
 import { clearState, loadState, saveState } from '@/lib/db';
-import { getProfileFromScore } from '@/data/profiles';
+import { getProfileFromExperience, getProfileFromScore } from '@/data/profiles';
 import { generateChallengesForProfile, getCurrentMonthKey } from '@/data/challenges';
+import { canCompleteChallenge, canCompleteLesson } from '@/lib/progress';
 
-const DEFAULT_CARDS = ['saldo', 'contas', 'entradas_saidas', 'gastos_categoria', 'score', 'sugestoes', 'metas'];
+const DEFAULT_CARDS = ['saldo', 'entradas_saidas', 'gastos_categoria', 'score', 'metas'];
 
 function initialState(): AppState {
   return {
-    onboarding: { completed: false, score: 0, profile: null },
+    onboarding: { completed: false, score: 0, profile: null, initialProfile: null },
     transactions: [],
     goals: [],
     accounts: [],
@@ -67,6 +68,12 @@ function uid(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
+function updateProfileFromExperience(onboarding: OnboardingState, xp: number): OnboardingState {
+  const initialProfile = onboarding.initialProfile ?? onboarding.profile;
+  if (!initialProfile) return onboarding;
+  return { ...onboarding, initialProfile, profile: getProfileFromExperience(initialProfile, xp) };
+}
+
 export const useStore = create<Store>((set, get) => ({
   ...initialState(),
 
@@ -74,14 +81,12 @@ export const useStore = create<Store>((set, get) => ({
     const saved = await loadState();
     if (saved) {
       const merged = { ...initialState(), ...saved };
-      if (!merged.cardOrder.includes('contas')) {
-        const saldoIdx = merged.cardOrder.indexOf('saldo');
-        if (saldoIdx >= 0) {
-          merged.cardOrder.splice(saldoIdx + 1, 0, 'contas');
-        } else {
-          merged.cardOrder.unshift('contas');
-        }
+      merged.cardOrder = [...new Set(merged.cardOrder.filter((cardId) => cardId !== 'contas' && cardId !== 'sugestoes'))];
+      merged.disabledCards = merged.disabledCards.filter((cardId) => cardId !== 'contas' && cardId !== 'sugestoes');
+      for (const cardId of DEFAULT_CARDS) {
+        if (!merged.cardOrder.includes(cardId)) merged.cardOrder.push(cardId);
       }
+      merged.onboarding = updateProfileFromExperience(merged.onboarding, merged.xp);
       set({ ...merged });
       get()._ensureMonthlyChallenges();
     }
@@ -92,7 +97,7 @@ export const useStore = create<Store>((set, get) => ({
     const monthKey = getCurrentMonthKey();
     const challenges = generateChallengesForProfile(profile, monthKey);
     set((s) => ({
-      onboarding: { completed: true, score, profile },
+      onboarding: { completed: true, score, profile, initialProfile: profile },
       challenges,
     }));
     get()._persist();
@@ -100,10 +105,11 @@ export const useStore = create<Store>((set, get) => ({
 
   addTransaction: (t) => {
     const transaction: Transaction = { ...t, id: uid() };
-    set((s) => ({
-      transactions: [transaction, ...s.transactions],
-      xp: s.xp + 5,
-    }));
+    set((s) => {
+      const xp = s.xp + 5;
+      return { transactions: [transaction, ...s.transactions], xp, onboarding: updateProfileFromExperience(s.onboarding, xp) };
+    });
+    get()._ensureMonthlyChallenges();
     get()._persist();
   },
 
@@ -114,7 +120,11 @@ export const useStore = create<Store>((set, get) => ({
 
   addGoal: (g) => {
     const goal: Goal = { ...g, id: uid(), criadaEm: new Date().toISOString(), valorAtual: 0 };
-    set((s) => ({ goals: [...s.goals, goal], xp: s.xp + 30 }));
+    set((s) => {
+      const xp = s.xp + 30;
+      return { goals: [...s.goals, goal], xp, onboarding: updateProfileFromExperience(s.onboarding, xp) };
+    });
+    get()._ensureMonthlyChallenges();
     get()._persist();
   },
 
@@ -187,40 +197,50 @@ export const useStore = create<Store>((set, get) => ({
   },
 
   addXp: (amount) => {
-    set((s) => ({ xp: Math.max(0, s.xp + amount) }));
+    set((s) => {
+      const xp = Math.max(0, s.xp + amount);
+      return { xp, onboarding: updateProfileFromExperience(s.onboarding, xp) };
+    });
+    get()._ensureMonthlyChallenges();
     get()._persist();
   },
 
   completeChallenge: (id) => {
     set((s) => {
       const challenge = s.challenges.find((c) => c.id === id);
-      if (!challenge || challenge.concluido) return s;
+      if (!challenge || challenge.concluido || !canCompleteChallenge(challenge, s)) return s;
+      const xp = s.xp + challenge.xp;
       return {
         challenges: s.challenges.map((c) =>
           c.id === id ? { ...c, concluido: true } : c
         ),
-        xp: s.xp + challenge.xp,
+        xp,
+        onboarding: updateProfileFromExperience(s.onboarding, xp),
       };
     });
+    get()._ensureMonthlyChallenges();
     get()._persist();
   },
 
   completeLesson: (lessonId) => {
     set((s) => {
       const existing = s.lessonProgress.find((l) => l.lessonId === lessonId);
-      if (existing?.concluido) return s;
+      if (existing?.concluido || !canCompleteLesson(lessonId, s)) return s;
       const progress: LessonProgress = {
         lessonId,
         concluido: true,
         concluidoEm: new Date().toISOString(),
       };
+      const xp = s.xp + 15;
       return {
         lessonProgress: existing
           ? s.lessonProgress.map((l) => (l.lessonId === lessonId ? progress : l))
           : [...s.lessonProgress, progress],
-        xp: s.xp + 15,
+        xp,
+        onboarding: updateProfileFromExperience(s.onboarding, xp),
       };
     });
+    get()._ensureMonthlyChallenges();
     get()._persist();
   },
 
@@ -284,9 +304,11 @@ export const useStore = create<Store>((set, get) => ({
     const s = get();
     if (!s.onboarding.profile) return;
     const monthKey = getCurrentMonthKey();
-    const hasCurrentMonth = s.challenges.some((c) => c.mes === monthKey);
-    if (!hasCurrentMonth) {
-      const newChallenges = generateChallengesForProfile(s.onboarding.profile, monthKey);
+    const availableChallenges = generateChallengesForProfile(s.onboarding.profile, monthKey);
+    const newChallenges = availableChallenges.filter(
+      (challenge) => !s.challenges.some((existing) => existing.id === challenge.id)
+    );
+    if (newChallenges.length > 0) {
       set({ challenges: [...s.challenges, ...newChallenges] });
       get()._persist();
     }

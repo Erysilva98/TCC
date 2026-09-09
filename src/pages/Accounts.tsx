@@ -18,6 +18,7 @@ const ACCOUNT_TYPES: { id: Account['tipo']; nome: string; icon: string; cor: str
   { id: 'cartao', nome: 'Cartão', icon: 'CreditCard', cor: '#f97316' },
   { id: 'dinheiro', nome: 'Dinheiro', icon: 'Wallet', cor: '#6b7280' },
 ];
+const NEW_ACCOUNT_TYPES = ACCOUNT_TYPES.filter((type) => type.id === 'conta_corrente' || type.id === 'poupanca');
 
 export function Accounts() {
   const accounts = useStore((s) => s.accounts);
@@ -210,7 +211,7 @@ export function Accounts() {
           <h3 className="font-bold text-ink-900 mb-3">Nova conta</h3>
           <input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Nome da conta" className="input mb-3" />
           <select value={tipo} onChange={(e) => setTipo(e.target.value as Account['tipo'])} className="input mb-3">
-            {ACCOUNT_TYPES.map((t) => (
+            {NEW_ACCOUNT_TYPES.map((t) => (
               <option key={t.id} value={t.id}>{t.nome}</option>
             ))}
           </select>

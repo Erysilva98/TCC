@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useStore } from '@/store/useStore';
 import { Landing } from '@/pages/Landing';
@@ -25,10 +25,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AppRoutes() {
   const init = useStore((s) => s.init);
   const onboarding = useStore((s) => s.onboarding);
-  const ready = useStore((s) => s.onboarding !== undefined);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    init();
+    void init().finally(() => setReady(true));
   }, [init]);
 
   if (!ready) {

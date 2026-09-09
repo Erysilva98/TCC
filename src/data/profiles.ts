@@ -76,6 +76,7 @@ export const PROFILES: Record<ProfileType, ProfileConfig> = {
       { label: 'Gastos', path: '/gastos', icon: 'Wallet' },
       { label: 'Contas', path: '/contas', icon: 'CreditCard' },
       { label: 'Metas', path: '/metas', icon: 'Target' },
+      { label: 'Aprender', path: '/aprender', icon: 'GraduationCap' },
       { label: 'Perfil', path: '/perfil', icon: 'User' },
     ],
     features: {
@@ -99,8 +100,9 @@ export const PROFILES: Record<ProfileType, ProfileConfig> = {
     objetivo: 'Construir patrimônio e planejar o futuro',
     menu: [
       { label: 'Início', path: '/dashboard', icon: 'Home' },
+      { label: 'Gastos', path: '/gastos', icon: 'Wallet' },
+      { label: 'Contas', path: '/contas', icon: 'CreditCard' },
       { label: 'Metas', path: '/metas', icon: 'Target' },
-      { label: 'Patrimônio', path: '/patrimonio', icon: 'Landmark' },
       { label: 'Aprender', path: '/aprender', icon: 'GraduationCap' },
       { label: 'Perfil', path: '/perfil', icon: 'User' },
     ],
@@ -125,6 +127,35 @@ export const PROFILES: Record<ProfileType, ProfileConfig> = {
     objetivo: 'Otimizar e estratégia financeira avançada',
     menu: [
       { label: 'Início', path: '/dashboard', icon: 'Home' },
+      { label: 'Gastos', path: '/gastos', icon: 'Wallet' },
+      { label: 'Análises', path: '/analises', icon: 'BarChart3' },
+      { label: 'Investimentos', path: '/investimentos', icon: 'PiggyBank' },
+      { label: 'Contas', path: '/contas', icon: 'CreditCard' },
+      { label: 'Metas', path: '/metas', icon: 'Target' },
+      { label: 'Perfil', path: '/perfil', icon: 'User' },
+    ],
+    features: {
+      orcamento: true, contas: true, metas: true, patrimonio: true,
+      analises: true, investimentos: true, aprender: true, comparacaoMensal: true,
+      evolucao: true, planejamento: true, relatoriosAvancados: true,
+      sugestoes: true, scoreSaude: true, metasAvancadas: true,
+      contasOrganizadas: true, reducaoCategoria: true, atualizarPatrimonio: true,
+      otimizarGastos: true, analisarRelatorio: true, estudarInvestimento: true,
+      criarOrcamento: true, organizarContas: true, guardarValor: true,
+      criarMeta: true,
+    },
+  },
+  mestre: {
+    id: 'mestre',
+    nome: 'Mestre Financeiro',
+    descricao: 'Domínio completo da vida financeira',
+    cor: '#d97706',
+    corLight: '#fef3c7',
+    icon: 'Trophy',
+    objetivo: 'Manter excelência e multiplicar resultados financeiros',
+    menu: [
+      { label: 'Início', path: '/dashboard', icon: 'Home' },
+      { label: 'Gastos', path: '/gastos', icon: 'Wallet' },
       { label: 'Análises', path: '/analises', icon: 'BarChart3' },
       { label: 'Investimentos', path: '/investimentos', icon: 'PiggyBank' },
       { label: 'Contas', path: '/contas', icon: 'CreditCard' },
@@ -149,4 +180,19 @@ export function getProfileFromScore(score: number): ProfileType {
   if (score <= 6) return 'equilibrado';
   if (score <= 8) return 'construtor';
   return 'estrategista';
+}
+
+const PROFILE_ORDER: ProfileType[] = ['explorer', 'equilibrado', 'construtor', 'estrategista', 'mestre'];
+export const XP_PER_LEVEL = 100;
+export const LEVELS_PER_PROFILE = 100;
+
+export function getProfileRank(profile: ProfileType): number {
+  return PROFILE_ORDER.indexOf(profile) + 1;
+}
+
+export function getProfileFromExperience(initialProfile: ProfileType, xp: number): ProfileType {
+  const initialRank = getProfileRank(initialProfile) - 1;
+  const xpPerProfile = XP_PER_LEVEL * LEVELS_PER_PROFILE;
+  const promotedRank = Math.min(PROFILE_ORDER.length - 1, initialRank + Math.floor(xp / xpPerProfile));
+  return PROFILE_ORDER[promotedRank];
 }

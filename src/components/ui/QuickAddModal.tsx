@@ -61,11 +61,11 @@ export function QuickAddModal({ open, onClose }: QuickAddModalProps) {
             className="fixed inset-0 bg-black/40 z-50"
           />
           <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl max-w-md mx-auto safe-bottom"
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 12 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            className="fixed inset-x-4 top-[5.75rem] z-50 bg-white rounded-3xl max-w-md mx-auto max-h-[82vh] overflow-y-auto safe-bottom"
           >
             <div className="flex items-center justify-between p-4 border-b border-ink-100">
               <div className="flex items-center gap-3">
@@ -84,7 +84,7 @@ export function QuickAddModal({ open, onClose }: QuickAddModalProps) {
               </button>
             </div>
 
-            <div className="p-4 min-h-[280px]">
+            <div className="p-4">
               <AnimatePresence mode="wait">
                 {step === 'tipo' && (
                   <motion.div key="tipo" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>

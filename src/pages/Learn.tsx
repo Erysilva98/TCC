@@ -1,16 +1,24 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GraduationCap, Clock, Award, X, CheckCircle, BookOpen } from 'lucide-react';
 import { Layout } from '@/components/ui/Layout';
 import { useStore } from '@/store/useStore';
 import { getLessonsForProfile, type Lesson } from '@/data/lessons';
+import { canCompleteLesson, getLessonTask } from '@/lib/progress';
 import type { ProfileType } from '@/types';
 
 export function Learn() {
   const profile = useStore((s) => s.onboarding.profile) as ProfileType;
   const lessonProgress = useStore((s) => s.lessonProgress);
   const completeLesson = useStore((s) => s.completeLesson);
+  const transactions = useStore((s) => s.transactions);
+  const goals = useStore((s) => s.goals);
+  const accounts = useStore((s) => s.accounts);
+  const assets = useStore((s) => s.assets);
+  const budgets = useStore((s) => s.budgets);
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
+  const navigate = useNavigate();
 
   const lessons = getLessonsForProfile(profile);
 
@@ -76,7 +84,7 @@ export function Learn() {
             <motion.div
               initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl max-w-md mx-auto max-h-[85vh] overflow-y-auto safe-bottom"
+              className="fixed inset-x-4 top-[8.0625rem] z-50 bg-white rounded-3xl max-w-md mx-auto max-h-[82vh] overflow-y-auto safe-bottom"
             >
               <div className="flex items-center justify-between p-4 border-b border-ink-100 sticky top-0 bg-white rounded-t-3xl">
                 <h2 className="font-bold text-ink-900">{activeLesson.titulo}</h2>
@@ -95,12 +103,21 @@ export function Learn() {
                 </div>
                 <p className="text-sm text-ink-700 leading-relaxed mb-4">{activeLesson.conteudo}</p>
                 {!isDone(activeLesson.id) ? (
-                  <button
-                    onClick={() => { completeLesson(activeLesson.id); setActiveLesson(null); }}
-                    className="btn-primary w-full"
-                  >
-                    <CheckCircle className="w-5 h-5" /> Concluir aula (+{activeLesson.xp} XP)
-                  </button>
+                  <div className="space-y-3">
+                    {(() => {
+                      const task = getLessonTask(activeLesson.id);
+                      const completeReady = canCompleteLesson(activeLesson.id, { transactions, goals, accounts, assets, budgets });
+                      return <><div className={`p-3 rounded-xl text-sm ${completeReady ? 'bg-primary-50 text-primary-800' : 'bg-ink-50 text-ink-700'}`}><p className="font-semibold mb-1">Atividade prática</p><p>{task.label}</p>{!completeReady && <button type="button" onClick={() => { setActiveLesson(null); navigate(task.path); }} className="mt-2 text-xs font-semibold text-primary-600">Realizar atividade</button>}</div>
+                    <button
+                      onClick={() => { completeLesson(activeLesson.id); setActiveLesson(null); }}
+                      disabled={!completeReady}
+                      className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <CheckCircle className="w-5 h-5" /> Concluir aula (+{activeLesson.xp} XP)
+                    </button>
+                      </>;
+                    })()}
+                  </div>
                 ) : (
                   <div className="flex items-center justify-center gap-2 text-primary-600 font-semibold py-2">
                     <CheckCircle className="w-5 h-5" /> Aula concluída

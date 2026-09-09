@@ -9,6 +9,9 @@ export interface Lesson {
   perfil: ProfileType[] | 'all';
   conteudo: string;
   desafio: string;
+  nivel?: number;
+  modulo?: string;
+  desafioPratico?: { tipo: string; descricao: string; validacao: string; rota: string };
 }
 
 export const LESSONS: Lesson[] = [
@@ -95,5 +98,22 @@ export const LESSONS: Lesson[] = [
 ];
 
 export function getLessonsForProfile(profile: ProfileType): Lesson[] {
-  return LESSONS.filter((l) => l.perfil === 'all' || l.perfil.includes(profile));
+  return TRACK_LESSONS.filter((l) => l.perfil === 'all' || l.perfil.includes(profile));
 }
+
+const TRACKS: Record<ProfileType, { modules: string[]; topics: string[]; tasks: { tipo: string; descricao: string; validacao: string; rota: string }[] }> = {
+  explorer: { modules: ['Conhecendo meu dinheiro', 'Consumo consciente', 'Primeiro planejamento'], topics: ['Controle financeiro', 'Para onde meu dinheiro vai', 'Receita x despesa', 'Necessidade e desejo', 'Hábitos financeiros', 'Metas iniciais'], tasks: [{ tipo: 'transacao', descricao: 'Registre uma transação no app.', validacao: 'transacao', rota: '/gastos' }, { tipo: 'categoria', descricao: 'Registre despesas em duas categorias.', validacao: 'categorias', rota: '/gastos' }, { tipo: 'meta', descricao: 'Crie sua primeira meta.', validacao: 'meta', rota: '/metas' }] },
+  equilibrado: { modules: ['Orçamento mensal', 'Organização financeira', 'Reserva e acompanhamento'], topics: ['Orçamento', 'Contas financeiras', 'Reserva financeira', 'Organização mensal', 'Comparação financeira', 'Economia planejada'], tasks: [{ tipo: 'orcamento', descricao: 'Defina um orçamento para uma categoria.', validacao: 'orcamento', rota: '/perfil' }, { tipo: 'conta', descricao: 'Cadastre uma conta com saldo.', validacao: 'conta', rota: '/contas' }, { tipo: 'transacao', descricao: 'Registre uma receita ou despesa.', validacao: 'transacao', rota: '/gastos' }] },
+  construtor: { modules: ['Metas avançadas', 'Patrimônio', 'Investimentos básicos'], topics: ['Metas com prazo', 'Planejamento', 'Patrimônio', 'Investimentos', 'Evolução financeira', 'Diversificação'], tasks: [{ tipo: 'meta', descricao: 'Crie uma meta financeira.', validacao: 'meta', rota: '/metas' }, { tipo: 'ativo', descricao: 'Cadastre um item de patrimônio.', validacao: 'ativo', rota: '/patrimonio' }, { tipo: 'investimento', descricao: 'Cadastre um investimento.', validacao: 'investimento', rota: '/investimentos' }] },
+  estrategista: { modules: ['Análise financeira', 'Otimização', 'Estratégia patrimonial'], topics: ['Indicadores', 'Relatórios', 'Projeções', 'Redução inteligente', 'Investimentos', 'Estratégia'], tasks: [{ tipo: 'transacao', descricao: 'Registre movimentações para análise.', validacao: 'transacao', rota: '/gastos' }, { tipo: 'ativo', descricao: 'Atualize seu patrimônio.', validacao: 'ativo', rota: '/patrimonio' }, { tipo: 'investimento', descricao: 'Registre um investimento.', validacao: 'investimento', rota: '/investimentos' }] },
+  mestre: { modules: ['Auditoria financeira', 'Independência financeira', 'Estratégia de longo prazo'], topics: ['Auditoria', 'Planejamento anual', 'Diversificação', 'Independência', 'Carteira patrimonial', 'Legado financeiro'], tasks: [{ tipo: 'orcamento', descricao: 'Revise um orçamento financeiro.', validacao: 'orcamento', rota: '/perfil' }, { tipo: 'ativo', descricao: 'Atualize seu patrimônio.', validacao: 'ativo', rota: '/patrimonio' }, { tipo: 'meta', descricao: 'Crie uma meta de longo prazo.', validacao: 'meta', rota: '/metas' }] },
+};
+
+export const TRACK_LESSONS: Lesson[] = (Object.keys(TRACKS) as ProfileType[]).flatMap((perfil) => Array.from({ length: 30 }, (_, index) => {
+  const track = TRACKS[perfil]; const tier = Math.floor(index / 10); const baseTask = track.tasks[index % track.tasks.length];
+  const topic = track.topics[index % track.topics.length];
+  const task = { ...baseTask, descricao: `${baseTask.descricao} Nesta missão, aplique ${topic.toLowerCase()} na etapa ${index + 1} da sua trilha.` };
+  return { id: `track-${perfil}-${index + 1}`, titulo: `${topic}: passo ${index + 1}`, descricao: `Aplique ${topic.toLowerCase()} à sua realidade financeira.`, duracao: `${3 + tier * 2} min`, xp: 10 + tier * 10, perfil: [perfil], desafio: task.tipo, nivel: tier * 33 + (index % 10) * 3 + 1, modulo: track.modules[tier], conteudo: `Nesta aula você aprende sobre ${topic.toLowerCase()} e transforma o conceito em uma decisão prática dentro do FinEdu Wallet.`, desafioPratico: task };
+}));
+
+export function getLessonById(id: string): Lesson | undefined { return [...LESSONS, ...TRACK_LESSONS].find((lesson) => lesson.id === id); }

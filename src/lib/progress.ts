@@ -1,4 +1,5 @@
 import type { AppState, Challenge } from '@/types';
+import { getLessonById } from '@/data/lessons';
 
 /** Regras verificáveis para liberar os desafios mensais. */
 export function canCompleteChallenge(challenge: Challenge, state: Pick<AppState, 'transactions' | 'goals' | 'accounts' | 'assets' | 'budgets' | 'lessonProgress'>): boolean {
@@ -6,6 +7,18 @@ export function canCompleteChallenge(challenge: Challenge, state: Pick<AppState,
   const expenses = state.transactions.filter((transaction) => transaction.tipo === 'despesa');
   const incomes = state.transactions.filter((transaction) => transaction.tipo === 'receita');
   const completedLessons = new Set(state.lessonProgress.filter((lesson) => lesson.concluido).map((lesson) => lesson.lessonId));
+
+  if (challenge.validacao) {
+    const validations: Record<string, boolean> = {
+      sempre: true, despesa_1: expenses.length >= 1, despesas_3: expenses.length >= 3,
+      receita_1: incomes.length >= 1, categorias_2: new Set(expenses.map((item) => item.categoria)).size >= 2,
+      meta_1: state.goals.length >= 1, conta_1: state.accounts.length >= 1, contas_2: state.accounts.length >= 2,
+      orcamento_1: state.budgets.length >= 1, saldo_guardado: state.accounts.some((item) => item.saldo > 0) || state.assets.some((item) => item.valor > 0),
+      investimento_1: state.assets.some((item) => item.tipo === 'investimento'), ativo_1: state.assets.length >= 1,
+      movimentos_3: state.transactions.length >= 3, saldo_positivo: incomes.reduce((sum, item) => sum + item.valor, 0) >= expenses.reduce((sum, item) => sum + item.valor, 0),
+    };
+    return validations[challenge.validacao] ?? false;
+  }
 
   switch (baseId) {
     case 'exp_reg15': return expenses.length >= 15;
@@ -43,6 +56,19 @@ type LessonState = Pick<AppState, 'transactions' | 'goals' | 'accounts' | 'asset
 
 export function canCompleteLesson(lessonId: string, state: LessonState): boolean {
   const expenses = state.transactions.filter((transaction) => transaction.tipo === 'despesa');
+  const lesson = getLessonById(lessonId);
+  if (lesson?.desafioPratico) {
+    const validations: Record<string, boolean> = {
+      transacao: state.transactions.length >= 1,
+      categorias: new Set(expenses.map((item) => item.categoria)).size >= 2,
+      meta: state.goals.length >= 1,
+      orcamento: state.budgets.length >= 1,
+      conta: state.accounts.length >= 1,
+      ativo: state.assets.length >= 1,
+      investimento: state.assets.some((item) => item.tipo === 'investimento'),
+    };
+    return validations[lesson.desafioPratico.validacao] ?? false;
+  }
   switch (lessonId) {
     case 'l1': return state.transactions.length >= 1;
     case 'l2': return expenses.length >= 1;
@@ -57,6 +83,8 @@ export function canCompleteLesson(lessonId: string, state: LessonState): boolean
 }
 
 export function getLessonTask(lessonId: string): { label: string; path: string } {
+  const lesson = getLessonById(lessonId);
+  if (lesson?.desafioPratico) return { label: lesson.desafioPratico.descricao, path: lesson.desafioPratico.rota };
   const tasks: Record<string, { label: string; path: string }> = {
     l1: { label: 'Registre uma transação no app.', path: '/gastos' },
     l2: { label: 'Registre uma despesa e classifique-a por categoria.', path: '/gastos' },

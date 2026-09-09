@@ -63,17 +63,7 @@ npm run dev
 
 O Vite deste projeto usa a porta `5173`. A URL do túnel só funcionará enquanto os dois comandos permanecerem abertos.
 
-### Opção A: Ngrok
-
-Depois de instalar e autenticar o [Ngrok](https://ngrok.com/), abra outro terminal e execute:
-
-```bash
-ngrok http 5173
-```
-
-Copie a URL HTTPS exibida, por exemplo `https://exemplo.ngrok-free.app`, e abra-a no navegador ou informe-a no PWABuilder.
-
-### Opção B: LocalTunnel
+### LocalTunnel
 
 Em outro terminal, execute:
 

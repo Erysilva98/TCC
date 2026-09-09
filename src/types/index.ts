@@ -54,6 +54,16 @@ export interface Challenge {
   perfil: ProfileType;
   concluido: boolean;
   mes: string; // YYYY-MM
+  nivelMinimo?: number;
+  categoria?: string;
+  validacao?: string;
+  teste?: boolean;
+}
+
+export interface ChallengeHistoryEntry {
+  templateId: string;
+  perfil: ProfileType;
+  mes: string;
 }
 
 export interface LessonProgress {
@@ -90,6 +100,7 @@ export interface AppState {
   accounts: Account[];
   assets: Asset[];
   challenges: Challenge[];
+  challengeHistory: ChallengeHistoryEntry[];
   lessonProgress: LessonProgress[];
   budgets: Budget[];
   transfers: Transfer[];

@@ -4,9 +4,11 @@ import type {
   ProfileType, Budget, LessonProgress, CategoryId, Transfer, OnboardingState,
 } from '@/types';
 import { clearState, loadState, saveState } from '@/lib/db';
-import { getProfileFromExperience, getProfileFromScore } from '@/data/profiles';
+import { getProfileFromExperience, getProfileFromScore, getProfileRank } from '@/data/profiles';
 import { generateChallengesForProfile, getCurrentMonthKey } from '@/data/challenges';
 import { canCompleteChallenge, canCompleteLesson } from '@/lib/progress';
+import { getLevel } from '@/lib/analytics';
+import { getLessonById } from '@/data/lessons';
 
 const DEFAULT_CARDS = ['saldo', 'entradas_saidas', 'gastos_categoria', 'score', 'metas'];
 
@@ -18,6 +20,7 @@ function initialState(): AppState {
     accounts: [],
     assets: [],
     challenges: [],
+    challengeHistory: [],
     lessonProgress: [],
     budgets: [],
     transfers: [],
@@ -81,6 +84,8 @@ export const useStore = create<Store>((set, get) => ({
     const saved = await loadState();
     if (saved) {
       const merged = { ...initialState(), ...saved };
+      const currentMonth = getCurrentMonthKey();
+      merged.challenges = merged.challenges.filter((challenge) => !(challenge.mes === currentMonth && (challenge.teste || !challenge.nivelMinimo)));
       merged.cardOrder = [...new Set(merged.cardOrder.filter((cardId) => cardId !== 'contas' && cardId !== 'sugestoes'))];
       merged.disabledCards = merged.disabledCards.filter((cardId) => cardId !== 'contas' && cardId !== 'sugestoes');
       for (const cardId of DEFAULT_CARDS) {
@@ -99,6 +104,7 @@ export const useStore = create<Store>((set, get) => ({
     set((s) => ({
       onboarding: { completed: true, score, profile, initialProfile: profile },
       challenges,
+      challengeHistory: challenges.filter((challenge) => !challenge.teste).map((challenge) => ({ templateId: challenge.id.replace(`_${monthKey}`, ''), perfil: profile, mes: monthKey })),
     }));
     get()._persist();
   },
@@ -231,7 +237,7 @@ export const useStore = create<Store>((set, get) => ({
         concluido: true,
         concluidoEm: new Date().toISOString(),
       };
-      const xp = s.xp + 15;
+      const xp = s.xp + (getLessonById(lessonId)?.xp ?? 15);
       return {
         lessonProgress: existing
           ? s.lessonProgress.map((l) => (l.lessonId === lessonId ? progress : l))
@@ -304,12 +310,15 @@ export const useStore = create<Store>((set, get) => ({
     const s = get();
     if (!s.onboarding.profile) return;
     const monthKey = getCurrentMonthKey();
-    const availableChallenges = generateChallengesForProfile(s.onboarding.profile, monthKey);
-    const newChallenges = availableChallenges.filter(
-      (challenge) => !s.challenges.some((existing) => existing.id === challenge.id)
-    );
-    if (newChallenges.length > 0) {
-      set({ challenges: [...s.challenges, ...newChallenges] });
+    const currentChallenges = s.challenges.filter((challenge) => challenge.mes === monthKey && challenge.perfil === s.onboarding.profile && !challenge.teste);
+    if (currentChallenges.length === 4) return;
+    const profileRank = getProfileRank(s.onboarding.profile);
+    const initialRank = s.onboarding.initialProfile ? getProfileRank(s.onboarding.initialProfile) : profileRank;
+    const level = getLevel(s.xp, profileRank, initialRank).level;
+    const newChallenges = generateChallengesForProfile(s.onboarding.profile, monthKey, level, s.challengeHistory);
+    if (newChallenges.length === 4) {
+      const history = [...s.challengeHistory, ...newChallenges.filter((challenge) => !challenge.teste).map((challenge) => ({ templateId: challenge.id.replace(`_${monthKey}`, ''), perfil: challenge.perfil, mes: monthKey }))];
+      set({ challenges: [...s.challenges, ...newChallenges], challengeHistory: history });
       get()._persist();
     }
   },

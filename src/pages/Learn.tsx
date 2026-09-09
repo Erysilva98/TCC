@@ -58,6 +58,7 @@ export function Learn() {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-ink-900 text-sm">{lesson.titulo}</h3>
+                {lesson.modulo && <p className="text-[10px] font-semibold text-primary-600 mt-0.5">{lesson.modulo} · Nível {lesson.nivel}</p>}
                 <p className="text-xs text-ink-500 mt-0.5 line-clamp-2">{lesson.descricao}</p>
                 <div className="flex items-center gap-3 mt-2">
                   <span className="flex items-center gap-1 text-xs text-ink-400">
@@ -102,6 +103,7 @@ export function Learn() {
                   </span>
                 </div>
                 <p className="text-sm text-ink-700 leading-relaxed mb-4">{activeLesson.conteudo}</p>
+                {activeLesson.modulo && <p className="text-xs font-semibold text-primary-600 mb-3">{activeLesson.modulo} · Nível {activeLesson.nivel}</p>}
                 {!isDone(activeLesson.id) ? (
                   <div className="space-y-3">
                     {(() => {

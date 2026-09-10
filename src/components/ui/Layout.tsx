@@ -39,7 +39,7 @@ export function XpProgressInfo() {
   );
 }
 
-export function Layout({ children, title, headerRight, showHeader = true, showNav = true }: LayoutProps) {
+export function Layout({ children, headerRight, showHeader = true, showNav = true }: LayoutProps) {
   const profile = useStore((s) => s.onboarding.profile);
   const initialProfile = useStore((s) => s.onboarding.initialProfile);
   const xp = useStore((s) => s.xp);
@@ -106,11 +106,6 @@ export function Layout({ children, title, headerRight, showHeader = true, showNa
               <div className="mr-[3%]">{headerRight ?? defaultLevelCard}</div>
             </div>
           </div>
-          {title && (
-            <div className="max-w-md mx-auto px-4 pb-3">
-              <h1 className="text-xl font-bold text-ink-900">{title}</h1>
-            </div>
-          )}
         </header>
       )}
       <motion.main

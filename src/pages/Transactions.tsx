@@ -16,6 +16,7 @@ import type { CategoryId } from '@/types';
 export function Transactions() {
   const [showAdd, setShowAdd] = useState(false);
   const [filter, setFilter] = useState<'all' | 'receita' | 'despesa'>('all');
+  const [categoryFilter, setCategoryFilter] = useState<CategoryId | null>(null);
   const [search, setSearch] = useState('');
   const [selectedMonth, setSelectedMonth] = useState(() => new Date());
   const location = useLocation();
@@ -23,9 +24,10 @@ export function Transactions() {
   const deleteTransaction = useStore((s) => s.deleteTransaction);
 
   useEffect(() => {
-    const requested = location.state as { filter?: 'receita' | 'despesa'; month?: string } | null;
+    const requested = location.state as { filter?: 'receita' | 'despesa'; categoria?: CategoryId; month?: string } | null;
     const requestedFilter = requested?.filter;
     if (requestedFilter) setFilter(requestedFilter);
+    setCategoryFilter(requested?.categoria ?? null);
     if (requested?.month) {
       const [year, month] = requested.month.split('-').map(Number);
       if (year && month) setSelectedMonth(new Date(year, month - 1, 1));
@@ -37,11 +39,12 @@ export function Transactions() {
       const date = new Date(t.data);
       if (date.getFullYear() !== selectedMonth.getFullYear() || date.getMonth() !== selectedMonth.getMonth()) return false;
       if (filter !== 'all' && t.tipo !== filter) return false;
+      if (categoryFilter && t.categoria !== categoryFilter) return false;
       if (search && !t.descricao?.toLowerCase().includes(search.toLowerCase()) &&
           !CATEGORIES[t.categoria].nome.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [transactions, filter, search, selectedMonth]);
+  }, [transactions, filter, categoryFilter, search, selectedMonth]);
 
   const monthTx = transactions.filter((t) => {
     const date = new Date(t.data);

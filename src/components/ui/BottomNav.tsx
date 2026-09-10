@@ -13,7 +13,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-ink-200 safe-bottom">
-      <div className="max-w-md mx-auto flex items-center justify-around px-2 py-1.5">
+      <div className="max-w-md mx-auto flex items-center justify-around px-4 py-1.5">
         {menu.map((item) => {
           const Icon = (Icons as unknown as Record<string, LucideIcon>)[item.icon] || Icons.Circle;
           return (

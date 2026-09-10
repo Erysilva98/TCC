@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, Search, Filter } from 'lucide-react';
+import { Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Layout } from '@/components/ui/Layout';
 import { FAB } from '@/components/ui/FAB';
 import { QuickAddModal } from '@/components/ui/QuickAddModal';
@@ -15,32 +16,57 @@ import type { CategoryId } from '@/types';
 export function Transactions() {
   const [showAdd, setShowAdd] = useState(false);
   const [filter, setFilter] = useState<'all' | 'receita' | 'despesa'>('all');
+  const [categoryFilter, setCategoryFilter] = useState<CategoryId | null>(null);
   const [search, setSearch] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState(() => new Date());
+  const location = useLocation();
   const transactions = useStore((s) => s.transactions);
   const deleteTransaction = useStore((s) => s.deleteTransaction);
 
+  useEffect(() => {
+    const requested = location.state as { filter?: 'receita' | 'despesa'; categoria?: CategoryId; month?: string } | null;
+    const requestedFilter = requested?.filter;
+    if (requestedFilter) setFilter(requestedFilter);
+    setCategoryFilter(requested?.categoria ?? null);
+    if (requested?.month) {
+      const [year, month] = requested.month.split('-').map(Number);
+      if (year && month) setSelectedMonth(new Date(year, month - 1, 1));
+    }
+  }, [location.state]);
+
   const filtered = useMemo(() => {
     return transactions.filter((t) => {
+      const date = new Date(t.data);
+      if (date.getFullYear() !== selectedMonth.getFullYear() || date.getMonth() !== selectedMonth.getMonth()) return false;
       if (filter !== 'all' && t.tipo !== filter) return false;
+      if (categoryFilter && t.categoria !== categoryFilter) return false;
       if (search && !t.descricao?.toLowerCase().includes(search.toLowerCase()) &&
           !CATEGORIES[t.categoria].nome.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     });
-  }, [transactions, filter, search]);
+  }, [transactions, filter, categoryFilter, search, selectedMonth]);
 
-  const monthTx = transactions.filter((t) => isSameMonth(t.data));
+  const monthTx = transactions.filter((t) => {
+    const date = new Date(t.data);
+    return date.getFullYear() === selectedMonth.getFullYear() && date.getMonth() === selectedMonth.getMonth();
+  });
   const monthDespesas = monthTx.filter((t) => t.tipo === 'despesa').reduce((a, t) => a + t.valor, 0);
   const monthReceitas = monthTx.filter((t) => t.tipo === 'receita').reduce((a, t) => a + t.valor, 0);
 
   return (
-    <Layout title="Gastos">
+    <Layout title="Extrato">
+      <div className="flex items-center justify-between mb-3 bg-white rounded-xl shadow-card p-2">
+        <button type="button" onClick={() => setSelectedMonth((date) => new Date(date.getFullYear(), date.getMonth() - 1, 1))} className="p-1.5 text-ink-500" aria-label="Mês anterior"><ChevronLeft className="w-4 h-4" /></button>
+        <span className="text-sm font-semibold text-ink-800 capitalize">{selectedMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</span>
+        <button type="button" onClick={() => setSelectedMonth((date) => new Date(date.getFullYear(), date.getMonth() + 1, 1))} className="p-1.5 text-ink-500" aria-label="Próximo mês"><ChevronRight className="w-4 h-4" /></button>
+      </div>
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="p-3 bg-primary-50 rounded-2xl">
-          <p className="text-xs text-primary-700 font-medium">Receitas de {getMonthName()}</p>
+          <p className="text-xs text-primary-700 font-medium">Receitas do mês</p>
           <p className="text-lg font-bold text-primary-700">{formatCurrency(monthReceitas)}</p>
         </div>
         <div className="p-3 bg-red-50 rounded-2xl">
-          <p className="text-xs text-danger font-medium">Despesas de {getMonthName()}</p>
+          <p className="text-xs text-danger font-medium">Despesas do mês</p>
           <p className="text-lg font-bold text-danger">{formatCurrency(monthDespesas)}</p>
         </div>
       </div>
@@ -121,3 +147,5 @@ export function Transactions() {
     </Layout>
   );
 }
+
+

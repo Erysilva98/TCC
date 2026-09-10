@@ -152,10 +152,20 @@ export function getPatrimonio(transactions: Transaction[], assets: { valor: numb
   return saldo + assetTotal;
 }
 
-export function getLevel(xp: number): { level: number; current: number; needed: number; progress: number } {
-  const level = Math.floor(xp / 100) + 1;
-  const current = xp % 100;
+export function getLevel(
+  xp: number,
+  profileRank = 1,
+  initialProfileRank = profileRank,
+): { level: number; current: number; needed: number; progress: number } {
   const needed = 100;
+  const levelsPerProfile = 100;
+  const xpPerProfile = needed * levelsPerProfile;
+  const completedProfiles = Math.max(0, profileRank - initialProfileRank);
+  const profileXp = Math.max(0, xp - completedProfiles * xpPerProfile);
+  const level = Math.min(levelsPerProfile, Math.floor(profileXp / needed) + 1);
+  const current = level === levelsPerProfile && profileXp >= xpPerProfile
+    ? needed
+    : profileXp % needed;
   const progress = (current / needed) * 100;
   return { level, current, needed, progress };
 }

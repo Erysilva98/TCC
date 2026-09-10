@@ -13,6 +13,8 @@ export function Goals() {
   const addGoal = useStore((s) => s.addGoal);
   const updateGoal = useStore((s) => s.updateGoal);
   const deleteGoal = useStore((s) => s.deleteGoal);
+  const budgets = useStore((s) => s.budgets);
+  const transactions = useStore((s) => s.transactions);
   const [showForm, setShowForm] = useState(false);
   const [titulo, setTitulo] = useState('');
   const [valor, setValor] = useState('');
@@ -117,6 +119,20 @@ export function Goals() {
         <button onClick={() => setShowForm(true)} className="btn-secondary w-full mt-4">
           <Plus className="w-4 h-4" /> Nova meta
         </button>
+      )}
+
+      {budgets.length > 0 && (
+        <section className="mt-6">
+          <h2 className="font-bold text-ink-900 mb-3">Orçamentos por categoria</h2>
+          <div className="space-y-2">
+            {budgets.map((budget) => {
+              const spent = transactions.filter((transaction) => transaction.tipo === 'despesa' && transaction.categoria === budget.categoria).reduce((sum, transaction) => sum + transaction.valor, 0);
+              const percentage = Math.min(100, (spent / budget.limite) * 100);
+              const exceeded = spent > budget.limite;
+              return <div key={budget.categoria} className="bg-white rounded-2xl shadow-card p-3"><div className="flex justify-between text-xs mb-2"><span className="font-medium text-ink-800">{CATEGORIES[budget.categoria].nome}</span><span className={exceeded ? 'text-danger' : 'text-ink-500'}>{formatCurrency(spent)} / {formatCurrency(budget.limite)}</span></div><div className="h-2 rounded-full bg-ink-100 overflow-hidden"><div className={`h-full rounded-full ${exceeded ? 'bg-danger' : 'bg-primary-600'}`} style={{ width: `${percentage}%` }} /></div></div>;
+            })}
+          </div>
+        </section>
       )}
     </Layout>
   );

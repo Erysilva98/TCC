@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   PiggyBank, TrendingUp, BookOpen, ArrowRight, Plus, Trash2, X,
@@ -33,7 +33,7 @@ export function Investments() {
   }
 
   return (
-    <Layout title="Investimentos">
+    <Layout title="Carteira">
       <div className="p-4 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl text-white mb-4">
         <div className="flex items-center gap-2 mb-1">
           <PiggyBank className="w-5 h-5" />
@@ -132,3 +132,5 @@ export function Investments() {
     </Layout>
   );
 }
+
+

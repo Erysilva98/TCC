@@ -14,6 +14,16 @@ const STATE_KEY = 'main';
 
 let dbPromise: Promise<IDBPDatabase<FinEduDB>> | null = null;
 
+/** Solicita ao navegador que preserve os dados locais do app quando suportado. */
+export async function requestPersistentStorage(): Promise<boolean> {
+  if (!('storage' in navigator) || !navigator.storage.persist) return false;
+  try {
+    return await navigator.storage.persist();
+  } catch {
+    return false;
+  }
+}
+
 function getDB() {
   if (!dbPromise) {
     dbPromise = openDB<FinEduDB>(DB_NAME, DB_VERSION, {

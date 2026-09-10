@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useStore } from '@/store/useStore';
 import { Landing } from '@/pages/Landing';
@@ -12,6 +12,8 @@ import { Learn } from '@/pages/Learn';
 import { Analytics } from '@/pages/Analytics';
 import { Investments } from '@/pages/Investments';
 import { Profile } from '@/pages/Profile';
+import { Forecasts } from '@/pages/Forecasts';
+import { Budgets } from '@/pages/Budgets';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const onboarding = useStore((s) => s.onboarding);
@@ -25,10 +27,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AppRoutes() {
   const init = useStore((s) => s.init);
   const onboarding = useStore((s) => s.onboarding);
-  const ready = useStore((s) => s.onboarding !== undefined);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    init();
+    void init().finally(() => setReady(true));
   }, [init]);
 
   if (!ready) {
@@ -52,6 +54,8 @@ function AppRoutes() {
       <Route path="/analises" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
       <Route path="/investimentos" element={<ProtectedRoute><Investments /></ProtectedRoute>} />
       <Route path="/perfil" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/previsoes" element={<ProtectedRoute><Forecasts /></ProtectedRoute>} />
+      <Route path="/orcamentos" element={<ProtectedRoute><Budgets /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

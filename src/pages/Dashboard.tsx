@@ -28,10 +28,10 @@ import type { ProfileType, Account, Asset, CategoryId } from '@/types';
 
 const CARD_META: Record<string, { title: string; icon: string }> = {
   saldo: { title: 'Saldo Total', icon: 'Wallet' },
-  entradas_saidas: { title: 'Entradas x SaÃ­das', icon: 'ArrowUpDown' },
+  entradas_saidas: { title: 'Entradas x Saídas', icon: 'ArrowUpDown' },
   gastos_categoria: { title: 'Gastos por Categoria', icon: 'PieChart' },
-  score: { title: 'SaÃºde Financeira', icon: 'Activity' },
-  comparacao: { title: 'ComparaÃ§Ã£o Mensal', icon: 'BarChart3' },
+  score: { title: 'Saúde Financeira', icon: 'Activity' },
+  comparacao: { title: 'Comparação Mensal', icon: 'BarChart3' },
   metas: { title: 'Metas', icon: 'Target' },
 };
 
@@ -57,7 +57,7 @@ export function Dashboard() {
   const totalInvestimentos = assets
     .filter((a) => a.tipo === 'investimento')
     .reduce((a, acc) => a + acc.valor, 0);
-  // Contas representam o saldo inicial informado; lanÃ§amentos atualizam o saldo exibido.
+  // Contas representam o saldo inicial informado; lançamentos atualizam o saldo exibido.
   const saldoTotal = saldoContas + totalInvestimentos + saldoTransacoes;
 
   const receitas = getReceitasMes(transactions);
@@ -103,7 +103,7 @@ export function Dashboard() {
   }
 
   return (
-    <Layout headerRight={<div className="relative shrink-0"><div className="h-10 px-2.5 rounded-xl flex items-center gap-2" style={{ backgroundColor: profileConfig.corLight }}><button type="button" onClick={() => navigate(profileConfig.menu.some((item) => item.path === '/aprender') ? '/aprender' : '/perfil', { state: { section: 'desafios' } })} className="flex items-center gap-1.5 text-left"><span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: profileConfig.cor }}>{profileRank}</span>{isMasterProfile ? <Icons.Trophy className="w-5 h-5 fill-amber-400 text-amber-600" aria-label="ClassificaÃ§Ã£o mÃ¡xima: Mestre Financeiro" /> : <span className="text-[11px] leading-tight" style={{ color: profileConfig.cor }}><b className="block">NÃ­vel {level.level}</b><span>{level.current}/{level.needed} XP</span></span>}</button><button type="button" onClick={() => setShowXpTasks((open) => !open)} className="p-0.5" style={{ color: profileConfig.cor }} aria-label="Como ganhar XP"><CircleHelp className="w-4 h-4" /></button></div><AnimatePresence initial={false}>{showXpTasks && <motion.div ref={xpPanelRef} initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} className="absolute top-full right-0 z-[60] mt-2 w-[340px] max-w-[calc(100vw-2rem)] p-4 bg-white rounded-2xl shadow-card"><XpProgressInfo /></motion.div>}</AnimatePresence></div>}>
+    <Layout headerRight={<div className="relative shrink-0"><div className="h-10 px-2.5 rounded-xl flex items-center gap-2" style={{ backgroundColor: profileConfig.corLight }}><button type="button" onClick={() => navigate(profileConfig.menu.some((item) => item.path === '/aprender') ? '/aprender' : '/perfil', { state: { section: 'desafios' } })} className="flex items-center gap-1.5 text-left"><span className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center" style={{ backgroundColor: profileConfig.cor }}>{profileRank}</span>{isMasterProfile ? <Icons.Trophy className="w-5 h-5 fill-amber-400 text-amber-600" aria-label="Classificação máxima: Mestre Financeiro" /> : <span className="text-[11px] leading-tight" style={{ color: profileConfig.cor }}><b className="block">Nível {level.level}</b><span>{level.current}/{level.needed} XP</span></span>}</button><button type="button" onClick={() => setShowXpTasks((open) => !open)} className="p-0.5" style={{ color: profileConfig.cor }} aria-label="Como ganhar XP"><CircleHelp className="w-4 h-4" /></button></div><AnimatePresence initial={false}>{showXpTasks && <motion.div ref={xpPanelRef} initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} className="absolute top-full right-0 z-[60] mt-2 w-[340px] max-w-[calc(100vw-2rem)] p-4 bg-white rounded-2xl shadow-card"><XpProgressInfo /></motion.div>}</AnimatePresence></div>}>
       {/* XP Bar */}
       <div className="hidden">
         <div className="flex items-center justify-between mb-1.5">
@@ -111,7 +111,7 @@ export function Dashboard() {
             <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold text-sm">
               {profileRank}
             </div>
-            <span className="text-sm font-semibold text-ink-800">NÃ­vel {level.level}</span>
+            <span className="text-sm font-semibold text-ink-800">Nível {level.level}</span>
           </button>
           <button type="button" onClick={() => setShowXpTasks((open) => !open)} className="p-1 text-ink-400 hover:text-primary-600" aria-label="Como ganhar XP"><CircleHelp className="w-4 h-4" /></button>
         </div>
@@ -187,7 +187,7 @@ export function Dashboard() {
         })}
       </div>
 
-      {/* ComparaÃ§Ã£o mensal for equilibrado+ */}
+      {/* Comparação mensal for equilibrado+ */}
       {false && profileConfig.features.comparacaoMensal && (
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -197,7 +197,7 @@ export function Dashboard() {
         >
           <div className="flex items-center gap-2 mb-3">
             <Icons.BarChart3 className="w-5 h-5 text-primary-600" />
-            <h2 className="font-bold text-ink-900">ComparaÃ§Ã£o Mensal</h2>
+            <h2 className="font-bold text-ink-900">Comparação Mensal</h2>
           </div>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={comparacao} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
@@ -220,19 +220,19 @@ export function Dashboard() {
           className="btn-ghost text-sm"
         >
           <Settings2 className="w-4 h-4" />
-          {editingCards ? 'Concluir ediÃ§Ã£o' : 'Personalizar cards'}
+          {editingCards ? 'Concluir edição' : 'Personalizar cards'}
         </button>
       </div>
       {editingCards && (
         <div className="mt-3 bg-white rounded-2xl shadow-card p-4 space-y-3">
-          <div><h2 className="font-bold text-sm text-ink-900">Cards visÃ­veis</h2><p className="text-xs text-ink-500 mt-1">Use as setas de cada card para ordenar. O saldo total permanece fixo.</p></div>
+          <div><h2 className="font-bold text-sm text-ink-900">Cards visíveis</h2><p className="text-xs text-ink-500 mt-1">Use as setas de cada card para ordenar. O saldo total permanece fixo.</p></div>
           {visibleCards.filter((id) => id !== 'saldo').map((id) => <div key={id} className="flex items-center justify-between p-2.5 bg-ink-50 rounded-xl text-sm text-ink-700"><span>{CARD_META[id]?.title}</span><button type="button" onClick={() => toggleCard(id)} className="text-xs text-danger">Ocultar</button></div>)}
           {hiddenCards.length > 0 && <div><h3 className="font-semibold text-sm text-ink-800 mb-2">Cards ocultos</h3>{hiddenCards.map((id) => <div key={id} className="flex items-center justify-between p-2.5 bg-ink-50 rounded-xl text-sm text-ink-700 mb-2"><span>{CARD_META[id]?.title}</span><button type="button" onClick={() => toggleCard(id)} className="text-xs text-primary-600">Mostrar</button></div>)}</div>}
         </div>
       )}
 
       <p className="text-center text-xs text-ink-400 mt-4">
-        {getMonthName()} â€¢ {transactions.length} transaÃ§Ãµes registradas
+        {getMonthName()} • {transactions.length} transações registradas
       </p>
 
       <FAB onClick={() => setShowAdd(true)} />
@@ -290,7 +290,7 @@ function SaldoTotalCard({ saldo, accounts, investments, icon: Icon }: { saldo: n
     ...accounts.map((account) => ({
       id: account.id,
       nome: account.nome,
-      tipo: account.tipo === 'cartao' ? 'CartÃ£o' : 'Conta',
+      tipo: account.tipo === 'cartao' ? 'Cartão' : 'Conta',
       valor: account.saldo,
       cor: account.cor,
       icon: account.tipo === 'cartao' ? Icons.CreditCard : Icons.Landmark,
@@ -377,12 +377,12 @@ function EntradasSaidasCard(props: { receitas: number; despesas: number; previst
         <button type="button" onClick={(event) => { event.stopPropagation(); props.onNavigate('despesa'); }} className="order-1 p-3 bg-red-50 rounded-xl text-left transition-colors hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-200">
           <div className="flex items-center gap-1.5 mb-1">
             <TrendingDown className="w-4 h-4 text-danger" />
-            <span className="text-xs font-medium text-danger">SaÃ­das</span>
+            <span className="text-xs font-medium text-danger">Saídas</span>
           </div>
           <p className="text-lg font-bold text-danger">{formatCurrency(props.despesas)}</p>
         </button>
         <button type="button" onClick={(event) => { event.stopPropagation(); props.onForecast(); }} className="order-3 p-3 bg-amber-50 rounded-xl text-left transition-colors hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-200">
-          {props.learningProgress ? <><div className="flex items-center gap-1.5 mb-1"><Icons.GraduationCap className="w-4 h-4 text-amber-600" /><span className="text-xs font-medium text-amber-700">Evoluir perfil</span></div><p className="text-sm font-bold text-amber-700">{props.learningProgress.completed}/{props.learningProgress.total} aulas concluÃ­das</p></> : <><div className="flex items-center gap-1.5 mb-1"><Icons.CalendarClock className="w-4 h-4 text-amber-600" /><span className="text-xs font-medium text-amber-700">Previsto</span></div><p className="text-lg font-bold text-amber-700">{formatCurrency(props.previsto)}</p></>}
+          {props.learningProgress ? <><div className="flex items-center gap-1.5 mb-1"><Icons.GraduationCap className="w-4 h-4 text-amber-600" /><span className="text-xs font-medium text-amber-700">Evoluir perfil</span></div><p className="text-sm font-bold text-amber-700">{props.learningProgress.completed}/{props.learningProgress.total} aulas concluídas</p></> : <><div className="flex items-center gap-1.5 mb-1"><Icons.CalendarClock className="w-4 h-4 text-amber-600" /><span className="text-xs font-medium text-amber-700">Previsto</span></div><p className="text-lg font-bold text-amber-700">{formatCurrency(props.previsto)}</p></>}
         </button>
       </div>
     </CardShell>
@@ -397,7 +397,7 @@ function GastosCategoriaCard(props: { data: { categoria: CategoryId; name: strin
       <div role="button" tabIndex={0} onClick={props.onCardClick} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') props.onCardClick(); }} className="cursor-pointer"><CardShell {...props}>
         <div className="flex flex-col items-center justify-center py-6 text-center">
           <PieChart className="w-8 h-8 text-ink-300 mb-2" />
-          <p className="text-sm text-ink-400">Nenhum gasto registrado este mÃªs</p>
+          <p className="text-sm text-ink-400">Nenhum gasto registrado este mês</p>
         </div>
       </CardShell></div>
     );
@@ -439,7 +439,7 @@ function ScoreCard(props: { score: number; sugestoes: { tipo: string; texto: str
   const [expanded, setExpanded] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const color = props.score >= 70 ? '#16a34a' : props.score >= 40 ? '#f59e0b' : '#ef4444';
-  const label = props.score >= 70 ? 'SaudÃ¡vel' : props.score >= 40 ? 'AtenÃ§Ã£o' : 'Risco';
+  const label = props.score >= 70 ? 'Saudável' : props.score >= 40 ? 'Atenção' : 'Risco';
   useEffect(() => {
     if (!expanded) return;
     const closeWhenClickingOutside = (event: PointerEvent) => {
@@ -470,19 +470,19 @@ function ScoreCard(props: { score: number; sugestoes: { tipo: string; texto: str
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold" style={{ color }}>{label}</p>
           <p className="text-xs text-ink-500 mt-1">
-            {props.score >= 70 ? 'Suas finanÃ§as estÃ£o saudÃ¡veis. Continue assim!' :
-             props.score >= 40 ? 'AtenÃ§Ã£o aos gastos. Revise seu orÃ§amento.' :
-             'Suas finanÃ§as precisam de atenÃ§Ã£o. Reduza despesas.'}
+            {props.score >= 70 ? 'Suas finanças estão saudáveis. Continue assim!' :
+             props.score >= 40 ? 'Atenção aos gastos. Revise seu orçamento.' :
+             'Suas finanças precisam de atenção. Reduza despesas.'}
           </p>
         </div>
       </div>
-      <AnimatePresence initial={false}>{expanded && <motion.div ref={suggestionsRef} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="absolute left-0 top-full z-50 mt-2 w-full min-[500px]:w-[166.667%] p-4 bg-white rounded-2xl shadow-card"><p className="text-sm font-bold text-ink-900 mb-3">SugestÃµes</p><div className="space-y-2">{props.sugestoes.map((suggestion, index) => <div key={index} className="p-2.5 rounded-xl bg-ink-50 text-xs text-ink-700">{suggestion.texto}</div>)}</div></motion.div>}</AnimatePresence>
+      <AnimatePresence initial={false}>{expanded && <motion.div ref={suggestionsRef} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="absolute left-0 top-full z-50 mt-2 w-full min-[500px]:w-[166.667%] p-4 bg-white rounded-2xl shadow-card"><p className="text-sm font-bold text-ink-900 mb-3">Sugestões</p><div className="space-y-2">{props.sugestoes.map((suggestion, index) => <div key={index} className="p-2.5 rounded-xl bg-ink-50 text-xs text-ink-700">{suggestion.texto}</div>)}</div></motion.div>}</AnimatePresence>
     </CardShell></div>
   );
 }
 
 function ComparacaoCard({ data, onNavigate }: { data: { mes: string; receitas: number; despesas: number }[]; onNavigate: (month: string) => void }) {
-  return <div><div className="flex items-center gap-2 mb-3"><Icons.BarChart3 className="w-5 h-5 text-primary-600" /><h2 className="font-bold text-ink-900 text-sm">ComparaÃ§Ã£o Mensal</h2></div><ResponsiveContainer width="100%" height={180}><BarChart data={data} onClick={(event) => { const payload = (event as unknown as { activePayload?: { payload?: { mes?: string } }[] }).activePayload?.[0]?.payload; if (payload?.mes) onNavigate(payload.mes); }} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}><CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} /><XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} /><YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={(value) => formatCurrencyShort(value)} /><Tooltip formatter={(value) => formatCurrency(Number(value))} /><Legend wrapperStyle={{ fontSize: 11 }} /><Bar dataKey="receitas" name="Receitas" fill="#16a34a" radius={[4, 4, 0, 0]} /><Bar dataKey="despesas" name="Despesas" fill="#ef4444" radius={[4, 4, 0, 0]} /></BarChart></ResponsiveContainer><p className="text-[11px] text-ink-400 text-center">Toque em um mÃªs para ver os gastos.</p></div>;
+  return <div><div className="flex items-center gap-2 mb-3"><Icons.BarChart3 className="w-5 h-5 text-primary-600" /><h2 className="font-bold text-ink-900 text-sm">Comparação Mensal</h2></div><ResponsiveContainer width="100%" height={180}><BarChart data={data} onClick={(event) => { const payload = (event as unknown as { activePayload?: { payload?: { mes?: string } }[] }).activePayload?.[0]?.payload; if (payload?.mes) onNavigate(payload.mes); }} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}><CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} /><XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} /><YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={(value) => formatCurrencyShort(value)} /><Tooltip formatter={(value) => formatCurrency(Number(value))} /><Legend wrapperStyle={{ fontSize: 11 }} /><Bar dataKey="receitas" name="Receitas" fill="#16a34a" radius={[4, 4, 0, 0]} /><Bar dataKey="despesas" name="Despesas" fill="#ef4444" radius={[4, 4, 0, 0]} /></BarChart></ResponsiveContainer><p className="text-[11px] text-ink-400 text-center">Toque em um mês para ver os gastos.</p></div>;
 }
 
 function SugestoesCard(props: { sugestoes: { tipo: string; texto: string; icon: string }[]; icon: LucideIcon; title: string; editing: boolean; onToggle: () => void; onMoveUp?: () => void; onMoveDown?: () => void; canEdit: boolean }) {
@@ -545,4 +545,5 @@ function MetasCard(props: { goals: { id: string; titulo: string; valorAlvo: numb
     </CardShell>
   );
 }
+
 

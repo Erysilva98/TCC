@@ -42,7 +42,7 @@ export function Investments() {
         <p className="text-3xl font-extrabold">{formatCurrency(totalInvest)}</p>
         <p className="text-xs opacity-75 mt-2">
           {patrimonioTotal > 0
-            ? `${((totalInvest / patrimonioTotal) * 100).toFixed(0)}% do seu patrimÃ´nio`
+            ? `${((totalInvest / patrimonioTotal) * 100).toFixed(0)}% do seu patrimônio`
             : 'Cadastre seus investimentos'}
         </p>
       </div>
@@ -123,7 +123,7 @@ export function Investments() {
           <h2 className="font-bold text-ink-900 text-sm">Aprenda a Investir</h2>
         </div>
         <p className="text-sm text-ink-600 mb-3">
-          Conclua aulas sobre investimentos para tomar melhores decisÃµes.
+          Conclua aulas sobre investimentos para tomar melhores decisões.
         </p>
         <button onClick={() => navigate('/aprender')} className="btn-secondary w-full">
           Ver aulas <ArrowRight className="w-4 h-4" />
@@ -132,4 +132,5 @@ export function Investments() {
     </Layout>
   );
 }
+
 

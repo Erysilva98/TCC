@@ -3,7 +3,7 @@ import type {
   AppState, Transaction, Goal, Account, Asset, Challenge,
   ProfileType, Budget, LessonProgress, CategoryId, Transfer, OnboardingState, PlannedExpense, CreditCard, CreditCardExpense,
 } from '@/types';
-import { clearState, loadState, saveState } from '@/lib/db';
+import { clearState, loadState, requestPersistentStorage, saveState } from '@/lib/db';
 import { getProfileFromExperience, getProfileFromScore, getProfileRank } from '@/data/profiles';
 import { generateChallengesForProfile, getCurrentMonthKey } from '@/data/challenges';
 import { canCompleteChallenge, canCompleteLesson } from '@/lib/progress';
@@ -98,6 +98,7 @@ export const useStore = create<Store>((set, get) => ({
   ...initialState(),
 
   init: async () => {
+    void requestPersistentStorage();
     const saved = await loadState();
     if (saved) {
       const merged = { ...initialState(), ...saved };

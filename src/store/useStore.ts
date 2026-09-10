@@ -283,7 +283,8 @@ export const useStore = create<Store>((set, get) => ({
   payPlannedExpense: (id, date = new Date().toISOString()) => {
     set((s) => {
       const expense = s.plannedExpenses.find((item) => item.id === id);
-      if (!expense || (expense.pagamentos ?? []).includes(date.slice(0, 7))) return s;
+      const paymentKey = date.slice(0, 10);
+      if (!expense || (expense.pagamentos ?? []).includes(paymentKey)) return s;
       const month = date.slice(0, 7);
       const paymentDate = /^\d{4}-\d{2}-\d{2}$/.test(date) ? `${date}T12:00:00` : date;
       const parcelada = expense.recorrencia === 'parcelada';
@@ -291,7 +292,7 @@ export const useStore = create<Store>((set, get) => ({
       const finalizado = parcelada && expense.totalParcelas !== undefined && nextInstallment > expense.totalParcelas;
       const transaction: Transaction = { id: uid(), tipo: 'despesa', valor: expense.valor, categoria: expense.categoria, data: paymentDate, descricao: expense.titulo, origem: expense.tipo === 'divida' ? 'divida' : expense.tipo === 'fixa' ? 'fixa' : expense.tipo === 'recorrente' ? 'recorrente' : 'prevista' };
       const xp = s.xp + 5;
-      return { transactions: [transaction, ...s.transactions], xp, onboarding: updateProfileFromExperience(s.onboarding, xp), plannedExpenses: s.plannedExpenses.map((item) => item.id === id ? { ...item, pagamentos: [...(item.pagamentos ?? []), month], parcelaAtual: parcelada ? nextInstallment : item.parcelaAtual, status: finalizado ? 'finalizado' : item.status } : item) };
+      return { transactions: [transaction, ...s.transactions], xp, onboarding: updateProfileFromExperience(s.onboarding, xp), plannedExpenses: s.plannedExpenses.map((item) => item.id === id ? { ...item, pagamentos: [...(item.pagamentos ?? []), paymentKey], parcelaAtual: parcelada ? nextInstallment : item.parcelaAtual, status: finalizado ? 'finalizado' : item.status } : item) };
     });
     get()._ensureMonthlyChallenges(); get()._persist();
   },

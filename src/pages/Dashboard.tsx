@@ -379,7 +379,6 @@ function EntradasSaidasCard(props: { receitas: number; despesas: number; previst
         <button type="button" onClick={(event) => { event.stopPropagation(); props.onForecast(); }} className="order-3 p-3 bg-amber-50 rounded-xl text-left transition-colors hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-200">
           <div className="flex items-center gap-1.5 mb-1"><Icons.CalendarClock className="w-4 h-4 text-amber-600" /><span className="text-xs font-medium text-amber-700">Previsto</span></div>
           <p className="text-lg font-bold text-amber-700">{formatCurrency(props.previsto)}</p>
-          <p className="text-[10px] text-amber-700/80 mt-1">Ver previsões do mês</p>
         </button>
       </div>
     </CardShell>

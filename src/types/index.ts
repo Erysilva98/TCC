@@ -41,6 +41,8 @@ export interface PlannedExpense {
   observacao?: string;
   status: 'ativo' | 'finalizado';
   pagamentos: string[];
+  ignorados?: string[];
+  encerradoEm?: string;
 }
 
 export interface CreditCard {

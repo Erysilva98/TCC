@@ -13,6 +13,7 @@ import { Analytics } from '@/pages/Analytics';
 import { Investments } from '@/pages/Investments';
 import { Profile } from '@/pages/Profile';
 import { Forecasts } from '@/pages/Forecasts';
+import { Budgets } from '@/pages/Budgets';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const onboarding = useStore((s) => s.onboarding);
@@ -54,6 +55,7 @@ function AppRoutes() {
       <Route path="/investimentos" element={<ProtectedRoute><Investments /></ProtectedRoute>} />
       <Route path="/perfil" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       <Route path="/previsoes" element={<ProtectedRoute><Forecasts /></ProtectedRoute>} />
+      <Route path="/orcamentos" element={<ProtectedRoute><Budgets /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

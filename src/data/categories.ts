@@ -1,6 +1,6 @@
-import type { CategoryId } from '@/types';
+﻿import type { CategoryId } from '@/types';
 
-export interface CategoryConfig { id: CategoryId; nome: string; icon: string; cor: string; tipo: 'despesa' | 'receita' | 'ambos'; }
+export interface CategoryConfig { id: CategoryId; nome: string; icon: string; cor: string; tipo: 'despesa' | 'receita' | 'ambos' | 'objetivo'; }
 
 export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
   alimentacao: { id: 'alimentacao', nome: 'Alimentação', icon: 'UtensilsCrossed', cor: '#f97316', tipo: 'despesa' },
@@ -10,6 +10,7 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
   saude: { id: 'saude', nome: 'Saúde', icon: 'HeartPulse', cor: '#ef4444', tipo: 'despesa' },
   educacao: { id: 'educacao', nome: 'Educação', icon: 'BookOpen', cor: '#14b8a6', tipo: 'despesa' },
   cartao_credito: { id: 'cartao_credito', nome: 'Cartão de crédito', icon: 'CreditCard', cor: '#2563eb', tipo: 'despesa' },
+  investimentos_economia: { id: 'investimentos_economia', nome: 'Investimentos/Economia', icon: 'PiggyBank', cor: '#16a34a', tipo: 'objetivo' },
   salario: { id: 'salario', nome: 'Salário', icon: 'Banknote', cor: '#16a34a', tipo: 'receita' },
   outros: { id: 'outros', nome: 'Outros', icon: 'CircleDot', cor: '#6b7280', tipo: 'ambos' },
 };
@@ -17,3 +18,5 @@ export const CATEGORIES: Record<CategoryId, CategoryConfig> = {
 export const DESPESA_CATEGORIES: CategoryId[] = ['alimentacao', 'transporte', 'moradia', 'lazer', 'saude', 'educacao', 'cartao_credito', 'outros'];
 export const RECEITA_CATEGORIES: CategoryId[] = ['salario', 'outros'];
 export function getCategory(id: CategoryId): CategoryConfig { return CATEGORIES[id]; }
+
+

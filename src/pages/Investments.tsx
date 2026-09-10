@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   PiggyBank, TrendingUp, BookOpen, ArrowRight, Plus, Trash2, X,
@@ -33,7 +33,7 @@ export function Investments() {
   }
 
   return (
-    <Layout title="Investimentos">
+    <Layout title="Carteira">
       <div className="p-4 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl text-white mb-4">
         <div className="flex items-center gap-2 mb-1">
           <PiggyBank className="w-5 h-5" />
@@ -42,7 +42,7 @@ export function Investments() {
         <p className="text-3xl font-extrabold">{formatCurrency(totalInvest)}</p>
         <p className="text-xs opacity-75 mt-2">
           {patrimonioTotal > 0
-            ? `${((totalInvest / patrimonioTotal) * 100).toFixed(0)}% do seu patrimônio`
+            ? `${((totalInvest / patrimonioTotal) * 100).toFixed(0)}% do seu patrimÃ´nio`
             : 'Cadastre seus investimentos'}
         </p>
       </div>
@@ -123,7 +123,7 @@ export function Investments() {
           <h2 className="font-bold text-ink-900 text-sm">Aprenda a Investir</h2>
         </div>
         <p className="text-sm text-ink-600 mb-3">
-          Conclua aulas sobre investimentos para tomar melhores decisões.
+          Conclua aulas sobre investimentos para tomar melhores decisÃµes.
         </p>
         <button onClick={() => navigate('/aprender')} className="btn-secondary w-full">
           Ver aulas <ArrowRight className="w-4 h-4" />
@@ -132,3 +132,4 @@ export function Investments() {
     </Layout>
   );
 }
+

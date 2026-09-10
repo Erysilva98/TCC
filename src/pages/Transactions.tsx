@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+﻿import { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -51,19 +51,19 @@ export function Transactions() {
   const monthReceitas = monthTx.filter((t) => t.tipo === 'receita').reduce((a, t) => a + t.valor, 0);
 
   return (
-    <Layout title="Gastos">
+    <Layout title="Extrato">
       <div className="flex items-center justify-between mb-3 bg-white rounded-xl shadow-card p-2">
-        <button type="button" onClick={() => setSelectedMonth((date) => new Date(date.getFullYear(), date.getMonth() - 1, 1))} className="p-1.5 text-ink-500" aria-label="Mês anterior"><ChevronLeft className="w-4 h-4" /></button>
+        <button type="button" onClick={() => setSelectedMonth((date) => new Date(date.getFullYear(), date.getMonth() - 1, 1))} className="p-1.5 text-ink-500" aria-label="MÃªs anterior"><ChevronLeft className="w-4 h-4" /></button>
         <span className="text-sm font-semibold text-ink-800 capitalize">{selectedMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</span>
-        <button type="button" onClick={() => setSelectedMonth((date) => new Date(date.getFullYear(), date.getMonth() + 1, 1))} className="p-1.5 text-ink-500" aria-label="Próximo mês"><ChevronRight className="w-4 h-4" /></button>
+        <button type="button" onClick={() => setSelectedMonth((date) => new Date(date.getFullYear(), date.getMonth() + 1, 1))} className="p-1.5 text-ink-500" aria-label="PrÃ³ximo mÃªs"><ChevronRight className="w-4 h-4" /></button>
       </div>
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="p-3 bg-primary-50 rounded-2xl">
-          <p className="text-xs text-primary-700 font-medium">Receitas do mês</p>
+          <p className="text-xs text-primary-700 font-medium">Receitas do mÃªs</p>
           <p className="text-lg font-bold text-primary-700">{formatCurrency(monthReceitas)}</p>
         </div>
         <div className="p-3 bg-red-50 rounded-2xl">
-          <p className="text-xs text-danger font-medium">Despesas do mês</p>
+          <p className="text-xs text-danger font-medium">Despesas do mÃªs</p>
           <p className="text-lg font-bold text-danger">{formatCurrency(monthDespesas)}</p>
         </div>
       </div>
@@ -96,8 +96,8 @@ export function Transactions() {
       {filtered.length === 0 ? (
         <EmptyState
           icon={Icons.Receipt}
-          title="Nenhuma transação"
-          description="Toque no botão + para registrar seu primeiro gasto ou receita."
+          title="Nenhuma transaÃ§Ã£o"
+          description="Toque no botÃ£o + para registrar seu primeiro gasto ou receita."
         />
       ) : (
         <div className="space-y-2">
@@ -121,7 +121,7 @@ export function Transactions() {
                     <p className="text-sm font-semibold text-ink-900 truncate">
                       {t.descricao || cat.nome}
                     </p>
-                    <p className="text-xs text-ink-400">{cat.nome} • {formatDate(t.data)}</p>
+                    <p className="text-xs text-ink-400">{cat.nome} â€¢ {formatDate(t.data)}</p>
                   </div>
                   <span className={`text-sm font-bold ${t.tipo === 'receita' ? 'text-primary-600' : 'text-ink-900'}`}>
                     {t.tipo === 'receita' ? '+' : '-'}{formatCurrency(t.valor)}
@@ -144,3 +144,4 @@ export function Transactions() {
     </Layout>
   );
 }
+

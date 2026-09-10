@@ -1,22 +1,22 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Trophy, Target, RotateCcw, Award, CheckCircle, Circle,
-  Wallet, Settings,
+  Wallet,
 } from 'lucide-react';
 import { Layout, XpProgressInfo } from '@/components/ui/Layout';
 import { useStore } from '@/store/useStore';
 import { PROFILES } from '@/data/profiles';
 import { CATEGORIES } from '@/data/categories';
-import { formatCurrency, getMonthName } from '@/lib/format';
+import { getMonthName } from '@/lib/format';
 import { canCompleteChallenge, getChallengeProgress } from '@/lib/progress';
 import type { CategoryId } from '@/types';
 
 export function Profile() {
   const {
     onboarding, xp, challenges, goals, transactions, budgets, accounts, assets, lessonProgress,
-    completeChallenge, setBudget, resetApp,
+    completeChallenge, resetApp,
   } = useStore();
 
   const [showBudget, setShowBudget] = useState(false);
@@ -38,13 +38,6 @@ export function Profile() {
   const monthChallenges = challenges.filter((c) => c.mes === `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`);
   const doneChallenges = monthChallenges.filter((c) => c.concluido).length;
   const totalCompletedChallenges = challenges.filter((c) => c.concluido).length;
-
-  function handleSetBudget() {
-    if (!budgetVal) return;
-    setBudget(budgetCat, parseFloat(budgetVal.replace(',', '.')));
-    setBudgetVal('');
-    setShowBudget(false);
-  }
 
   async function handleResetConfirmed() {
     await resetApp();
@@ -139,64 +132,6 @@ export function Profile() {
         </div>
       </motion.div>
 
-      {/* Budget (if feature available) */}
-      {config.features.orcamento && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-card p-4 mb-4"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Settings className="w-5 h-5 text-primary-600" />
-              <h2 className="font-bold text-ink-900 text-sm">Orçamentos</h2>
-            </div>
-            <button onClick={() => setShowBudget(!showBudget)} className="text-xs text-primary-600 font-medium">
-              {showBudget ? 'Fechar' : 'Definir'}
-            </button>
-          </div>
-
-          {budgets.length > 0 && (
-            <div className="space-y-2 mb-3">
-              {budgets.map((b) => {
-                const cat = CATEGORIES[b.categoria];
-                const gasto = transactions
-                  .filter((t) => t.tipo === 'despesa' && t.categoria === b.categoria)
-                  .reduce((acc, t) => acc + t.valor, 0);
-                const pct = Math.min(100, (gasto / b.limite) * 100);
-                const over = gasto > b.limite;
-                return (
-                  <div key={b.categoria}>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="font-medium text-ink-700">{cat.nome}</span>
-                      <span className={over ? 'text-danger' : 'text-ink-500'}>
-                        {formatCurrency(gasto)} / {formatCurrency(b.limite)}
-                      </span>
-                    </div>
-                    <div className="h-2 bg-ink-100 rounded-full overflow-hidden">
-                      <div className={`h-full rounded-full ${over ? 'bg-danger' : 'bg-primary-600'}`} style={{ width: `${pct}%` }} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {showBudget && (
-            <div className="p-3 bg-ink-50 rounded-xl space-y-2">
-              <select value={budgetCat} onChange={(e) => setBudgetCat(e.target.value as CategoryId)} className="input text-sm py-2">
-                {Object.values(CATEGORIES).filter((c) => c.tipo === 'despesa').map((c) => (
-                  <option key={c.id} value={c.id}>{c.nome}</option>
-                ))}
-              </select>
-              <input value={budgetVal} onChange={(e) => setBudgetVal(e.target.value.replace(/[^0-9.,]/g, ''))} placeholder="Limite (R$)" inputMode="decimal" className="input text-sm py-2" />
-              <button onClick={handleSetBudget} disabled={!budgetVal} className="btn-primary w-full text-sm py-2">Definir orçamento</button>
-            </div>
-          )}
-        </motion.div>
-      )}
-
       {/* XP Rules */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -229,3 +164,7 @@ export function Profile() {
     </Layout>
   );
 }
+
+
+
+

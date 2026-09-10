@@ -24,6 +24,7 @@ function initialState(): AppState {
     challengeHistory: [],
     lessonProgress: [],
     budgets: [],
+    investmentGoal: 0,
     transfers: [],
     plannedExpenses: [],
     creditCards: [],
@@ -53,6 +54,8 @@ interface StoreActions {
   completeChallenge: (id: string) => void;
   completeLesson: (lessonId: string) => void;
   setBudget: (categoria: CategoryId, limite: number) => void;
+  deleteBudget: (categoria: CategoryId) => void;
+  setInvestmentGoal: (valor: number) => void;
   addPlannedExpense: (item: Omit<PlannedExpense, 'id' | 'pagamentos' | 'status'>) => void;
   updatePlannedExpense: (id: string, item: Partial<PlannedExpense>) => void;
   deletePlannedExpense: (id: string) => void;
@@ -326,6 +329,16 @@ export const useStore = create<Store>((set, get) => ({
     get()._persist();
   },
 
+  deleteBudget: (categoria) => {
+    set((s) => ({ budgets: s.budgets.filter((budget) => budget.categoria !== categoria) }));
+    get()._persist();
+  },
+
+  setInvestmentGoal: (valor) => {
+    set({ investmentGoal: Math.max(0, valor) });
+    get()._persist();
+  },
+
   toggleCard: (cardId) => {
     set((s) => {
       const isDisabled = s.disabledCards.includes(cardId);
@@ -358,14 +371,14 @@ export const useStore = create<Store>((set, get) => ({
       addGoal: _ag, updateGoal: _ug, deleteGoal: _dg, addAccount: _aa, updateAccountBalance: _uab,
       deleteAccount: _da, addAsset: _as, deleteAsset: _dsa, addInvestment: _ai,
       transferBetweenAccounts: _tba, addXp: _ax, completeChallenge: _cc,
-      completeLesson: _cl, setBudget: _sb, addPlannedExpense: _ape, updatePlannedExpense: _upe, deletePlannedExpense: _dpe, payPlannedExpense: _ppe,
+      completeLesson: _cl, setBudget: _sb, deleteBudget: _db, setInvestmentGoal: _sig, addPlannedExpense: _ape, updatePlannedExpense: _upe, deletePlannedExpense: _dpe, payPlannedExpense: _ppe,
       addCreditCard: _acc, updateCreditCard: _ucc, deleteCreditCard: _dcc, addCreditCardExpense: _acce, deleteCreditCardExpense: _dcce, payCreditCardInvoice: _pcci, toggleCard: _tc, reorderCards: _rc,
       resetApp: _ra, _persist: _p, _ensureMonthlyChallenges: _emc,
       ...rest
     } = state;
     void _init; void _co; void _at; void _dt; void _ag; void _ug; void _dg;
     void _aa; void _uab; void _da; void _as; void _dsa; void _ai; void _tba;
-    void _ax; void _cc; void _cl; void _sb; void _ape; void _upe; void _dpe; void _ppe; void _acc; void _ucc; void _dcc; void _acce; void _dcce; void _pcci; void _tc; void _rc; void _ra;
+    void _ax; void _cc; void _cl; void _sb; void _db; void _sig; void _ape; void _upe; void _dpe; void _ppe; void _acc; void _ucc; void _dcc; void _acce; void _dcce; void _pcci; void _tc; void _rc; void _ra;
     void _p; void _emc;
     scheduleSave(rest as AppState);
   },

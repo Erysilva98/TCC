@@ -10,6 +10,7 @@ export type CategoryId =
   | 'saude'
   | 'educacao'
   | 'cartao_credito'
+  | 'investimentos_economia'
   | 'salario'
   | 'outros';
 
@@ -152,6 +153,7 @@ export interface AppState {
   challengeHistory: ChallengeHistoryEntry[];
   lessonProgress: LessonProgress[];
   budgets: Budget[];
+  investmentGoal: number;
   transfers: Transfer[];
   plannedExpenses: PlannedExpense[];
   creditCards: CreditCard[];

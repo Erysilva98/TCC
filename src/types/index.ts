@@ -9,6 +9,7 @@ export type CategoryId =
   | 'lazer'
   | 'saude'
   | 'educacao'
+  | 'cartao_credito'
   | 'salario'
   | 'outros';
 
@@ -19,6 +20,52 @@ export interface Transaction {
   categoria: CategoryId;
   data: string; // ISO date string
   descricao?: string;
+  origem?: 'divida' | 'prevista' | 'cartao' | 'fixa' | 'recorrente';
+}
+
+export type PlannedExpenseType = 'divida' | 'fixa' | 'recorrente' | 'avulsa' | 'outro';
+export type Recurrence = 'unica' | 'mensal' | 'quinzenal' | 'semanal' | 'anual' | 'parcelada';
+
+export interface PlannedExpense {
+  id: string;
+  titulo: string;
+  categoria: CategoryId;
+  valor: number;
+  tipo: PlannedExpenseType;
+  dataInicio: string;
+  vencimento: string;
+  recorrencia: Recurrence;
+  repeticoes?: number;
+  totalParcelas?: number;
+  parcelaAtual?: number;
+  observacao?: string;
+  status: 'ativo' | 'finalizado';
+  pagamentos: string[];
+}
+
+export interface CreditCard {
+  id: string;
+  nome: string;
+  bandeira?: string;
+  cor: string;
+  limite?: number;
+  diaFechamento: number;
+  diaVencimento: number;
+  observacao?: string;
+}
+
+export interface CreditCardExpense {
+  id: string;
+  cardId: string;
+  titulo: string;
+  categoria: CategoryId;
+  valor: number;
+  dataCompra: string;
+  tipo: 'unica' | 'parcelada' | 'recorrente';
+  parcelas?: number;
+  parcelaAtual?: number;
+  observacao?: string;
+  pagamentos: string[];
 }
 
 export interface Goal {
@@ -104,6 +151,9 @@ export interface AppState {
   lessonProgress: LessonProgress[];
   budgets: Budget[];
   transfers: Transfer[];
+  plannedExpenses: PlannedExpense[];
+  creditCards: CreditCard[];
+  creditCardExpenses: CreditCardExpense[];
   xp: number;
   cardOrder: string[];
   disabledCards: string[];

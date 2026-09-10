@@ -1,128 +1,22 @@
-import { motion } from 'framer-motion';
-import {
-  BarChart3, TrendingUp, TrendingDown, PieChart as PieChartIcon, Activity,
-} from 'lucide-react';
-import {
-  PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Legend,
-  BarChart, Bar,
-} from 'recharts';
+import { useState } from 'react';
+import { BarChart3, TrendingUp, TrendingDown, PieChart as PieChartIcon, Activity, ReceiptText, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, LineChart, Line, XAxis, YAxis, CartesianGrid, Legend, BarChart, Bar } from 'recharts';
 import { Layout } from '@/components/ui/Layout';
 import { useStore } from '@/store/useStore';
 import { CATEGORIES } from '@/data/categories';
-import {
-  getReceitasMes, getDespesasMes, getGastosPorCategoria, getScoreSaude,
-  getComparacaoMensal, getSaldo,
-} from '@/lib/analytics';
-import { formatCurrency, formatCurrencyShort, getMonthName } from '@/lib/format';
+import { getReceitasMes, getDespesasMes, getGastosPorCategoria, getScoreSaude, getComparacaoMensal, getSaldo } from '@/lib/analytics';
+import { getMonthlyForecast } from '@/lib/forecast';
+import { formatCurrency, formatCurrencyShort } from '@/lib/format';
+
+function InsightCard({ title, icon: Icon, summary, open, onToggle, children }: { title: string; icon: typeof BarChart3; summary: string; open: boolean; onToggle: () => void; children: React.ReactNode }) {
+  return <section className="bg-white rounded-2xl shadow-card overflow-hidden"><button onClick={onToggle} className="w-full p-4 flex items-start gap-2 text-left"><Icon className="w-5 h-5 text-primary-600 mt-0.5" /><span className="flex-1"><b className="block text-ink-900">{title}</b><small className="block text-ink-500 mt-1">{summary}</small></span>{open ? <ChevronUp className="text-ink-400"/> : <ChevronDown className="text-ink-400"/>}</button>{open && <div className="border-t border-ink-100 p-4">{children}</div>}</section>;
+}
 
 export function Analytics() {
-  const transactions = useStore((s) => s.transactions);
-  const budgets = useStore((s) => s.budgets);
-
-  const receitas = getReceitasMes(transactions);
-  const despesas = getDespesasMes(transactions);
-  const saldo = getSaldo(transactions);
-  const score = getScoreSaude(transactions, budgets);
-  const gastosCat = getGastosPorCategoria(transactions);
-  const comparacao = getComparacaoMensal(transactions);
-
-  const donutData = gastosCat.map((g) => ({
-    name: CATEGORIES[g.categoria].nome,
-    value: g.valor,
-    color: CATEGORIES[g.categoria].cor,
-  }));
-
-  const saldoData = comparacao.map((c) => ({
-    mes: c.mes,
-    saldo: c.receitas - c.despesas,
-  }));
-
-  return (
-    <Layout title="Análises">
-      <div className="grid grid-cols-3 gap-2 mb-4">
-        <div className="p-3 bg-white rounded-2xl shadow-card text-center">
-          <TrendingUp className="w-5 h-5 text-primary-600 mx-auto mb-1" />
-          <p className="text-[10px] text-ink-400">Receitas</p>
-          <p className="text-sm font-bold text-primary-700">{formatCurrencyShort(receitas)}</p>
-        </div>
-        <div className="p-3 bg-white rounded-2xl shadow-card text-center">
-          <TrendingDown className="w-5 h-5 text-danger mx-auto mb-1" />
-          <p className="text-[10px] text-ink-400">Despesas</p>
-          <p className="text-sm font-bold text-danger">{formatCurrencyShort(despesas)}</p>
-        </div>
-        <div className="p-3 bg-white rounded-2xl shadow-card text-center">
-          <Activity className="w-5 h-5 text-accent-600 mx-auto mb-1" />
-          <p className="text-[10px] text-ink-400">Score</p>
-          <p className="text-sm font-bold text-accent-600">{score}/100</p>
-        </div>
-      </div>
-
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl shadow-card p-4 mb-4">
-        <div className="flex items-center gap-2 mb-3">
-          <BarChart3 className="w-5 h-5 text-primary-600" />
-          <h2 className="font-bold text-ink-900 text-sm">Evolução do Saldo</h2>
-        </div>
-        <ResponsiveContainer width="100%" height={200}>
-          <LineChart data={saldoData} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
-            <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={(v) => formatCurrencyShort(v)} />
-            <Tooltip formatter={(v) => formatCurrency(Number(v))} contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: 12 }} />
-            <Line type="monotone" dataKey="saldo" stroke="#16a34a" strokeWidth={2.5} dot={{ r: 3 }} />
-          </LineChart>
-        </ResponsiveContainer>
-      </motion.div>
-
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white rounded-2xl shadow-card p-4 mb-4">
-        <div className="flex items-center gap-2 mb-3">
-          <PieChartIcon className="w-5 h-5 text-primary-600" />
-          <h2 className="font-bold text-ink-900 text-sm">Gastos por Categoria — {getMonthName()}</h2>
-        </div>
-        {donutData.length === 0 ? (
-          <p className="text-sm text-ink-400 text-center py-8">Sem dados ainda</p>
-        ) : (
-          <>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie data={donutData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value" label>
-                  {donutData.map((entry, i) => (
-                    <Cell key={i} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(v) => formatCurrency(Number(v))} contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: 12 }} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="grid grid-cols-2 gap-2 mt-3">
-              {donutData.map((d) => (
-                <div key={d.name} className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                  <span className="text-xs text-ink-700 flex-1 truncate">{d.name}</span>
-                  <span className="text-xs font-semibold text-ink-900">{formatCurrencyShort(d.value)}</span>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </motion.div>
-
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-white rounded-2xl shadow-card p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <BarChart3 className="w-5 h-5 text-primary-600" />
-          <h2 className="font-bold text-ink-900 text-sm">Receitas x Despesas (6 meses)</h2>
-        </div>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={comparacao} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
-            <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} tickFormatter={(v) => formatCurrencyShort(v)} />
-            <Tooltip formatter={(v) => formatCurrency(Number(v))} contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: 12 }} />
-            <Legend wrapperStyle={{ fontSize: 11 }} />
-            <Bar dataKey="receitas" name="Receitas" fill="#16a34a" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="despesas" name="Despesas" fill="#ef4444" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </motion.div>
-    </Layout>
-  );
+  const { transactions, budgets, plannedExpenses, creditCards, creditCardExpenses } = useStore();
+  const [date, setDate] = useState(new Date()); const [open, setOpen] = useState<Record<string, boolean>>({});
+  const toggle = (id: string) => setOpen((current) => ({ ...current, [id]: !current[id] }));
+  const receitas = getReceitasMes(transactions, date); const despesas = getDespesasMes(transactions, date); const saldo = getSaldo(transactions); const score = getScoreSaude(transactions, budgets); const gastos = getGastosPorCategoria(transactions, date); const comparison = getComparacaoMensal(transactions); const forecast = getMonthlyForecast(plannedExpenses, creditCards, creditCardExpenses, `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`);
+  const donut = gastos.map((item) => ({ name: CATEGORIES[item.categoria].nome, value: item.valor, color: CATEGORIES[item.categoria].cor })); const saldoData = comparison.map((item) => ({ mes: item.mes, saldo: item.receitas - item.despesas })); const month = date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).replace(/^./, (value) => value.toUpperCase());
+  return <Layout title="Análises"><div className="space-y-4"><div className="bg-white rounded-2xl shadow-card p-2 flex justify-between items-center"><button onClick={() => setDate((value) => new Date(value.getFullYear(), value.getMonth() - 1, 1))} className="p-1"><ChevronLeft /></button><b className="capitalize">{month}</b><button onClick={() => setDate((value) => new Date(value.getFullYear(), value.getMonth() + 1, 1))} className="p-1"><ChevronRight /></button></div><div className="grid grid-cols-3 gap-2"><div className="p-3 bg-white rounded-2xl shadow-card text-center"><TrendingUp className="w-5 h-5 text-primary-600 mx-auto"/><small className="block text-ink-400">Receitas</small><b className="text-primary-700">{formatCurrencyShort(receitas)}</b></div><div className="p-3 bg-white rounded-2xl shadow-card text-center"><TrendingDown className="w-5 h-5 text-danger mx-auto"/><small className="block text-ink-400">Despesas</small><b className="text-danger">{formatCurrencyShort(despesas)}</b></div><div className="p-3 bg-white rounded-2xl shadow-card text-center"><Activity className="w-5 h-5 text-accent-600 mx-auto"/><small className="block text-ink-400">Score</small><b>{score}/100</b></div></div><InsightCard title="Evolução do Saldo" icon={BarChart3} summary={formatCurrency(saldo)} open={!!open.saldo} onToggle={() => toggle('saldo')}><ResponsiveContainer width="100%" height={200}><LineChart data={saldoData}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="mes"/><YAxis tickFormatter={formatCurrencyShort}/><Tooltip formatter={(value) => formatCurrency(Number(value))}/><Line type="monotone" dataKey="saldo" stroke="#16a34a" strokeWidth={2.5}/></LineChart></ResponsiveContainer></InsightCard><InsightCard title={`Gastos por Categoria — ${month}`} icon={PieChartIcon} summary={`${donut.length} categorias`} open={!!open.categories} onToggle={() => toggle('categories')}>{donut.length ? <><ResponsiveContainer width="100%" height={200}><PieChart><Pie data={donut} dataKey="value" innerRadius={50} outerRadius={80}>{donut.map((item) => <Cell key={item.name} fill={item.color}/>)}</Pie><Tooltip formatter={(value) => formatCurrency(Number(value))}/></PieChart></ResponsiveContainer>{donut.map((item) => <div key={item.name} className="flex justify-between text-sm py-1"><span>{item.name}</span><b>{formatCurrency(item.value)}</b></div>)}</> : <p className="text-center text-ink-400 py-4">Sem dados no mês</p>}</InsightCard><InsightCard title="Entradas x Saídas (6 meses)" icon={BarChart3} summary={`${formatCurrency(receitas)} / ${formatCurrency(despesas)}`} open={!!open.flow} onToggle={() => toggle('flow')}><ResponsiveContainer width="100%" height={200}><BarChart data={comparison}><XAxis dataKey="mes"/><YAxis tickFormatter={formatCurrencyShort}/><Tooltip formatter={(value) => formatCurrency(Number(value))}/><Legend/><Bar dataKey="receitas" fill="#16a34a" name="Receitas"/><Bar dataKey="despesas" fill="#ef4444" name="Despesas"/></BarChart></ResponsiveContainer></InsightCard><InsightCard title="Previsto x Realizado" icon={ReceiptText} summary={`${formatCurrency(forecast.total)} previsto`} open={!!open.forecast} onToggle={() => toggle('forecast')}><div className="grid grid-cols-3 text-center"><span><small className="block text-ink-400">Previsto</small><b>{formatCurrency(forecast.total)}</b></span><span><small className="block text-ink-400">Pago</small><b className="text-danger">{formatCurrency(despesas)}</b></span><span><small className="block text-ink-400">Pendente</small><b className="text-primary-700">{formatCurrency(forecast.pending)}</b></span></div></InsightCard></div></Layout>;
 }

@@ -20,6 +20,7 @@ import {
   getScoreSaude, getSugestoes, getComparacaoMensal, getLevel,
 } from '@/lib/analytics';
 import { formatCurrency, formatCurrencyShort, getMonthName } from '@/lib/format';
+import { getMonthlyForecast } from '@/lib/forecast';
 import * as Icons from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { ProfileType, Account, Asset } from '@/types';
@@ -44,7 +45,7 @@ export function Dashboard() {
     transactions, goals, budgets, xp,
     cardOrder, disabledCards,
     onboarding, toggleCard, reorderCards,
-    accounts, assets,
+    accounts, assets, plannedExpenses, creditCards, creditCardExpenses,
   } = useStore();
 
   const profile = onboarding.profile as ProfileType;
@@ -64,6 +65,7 @@ export function Dashboard() {
   const score = getScoreSaude(transactions, budgets);
   const sugestoes = getSugestoes(transactions, budgets);
   const comparacao = getComparacaoMensal(transactions);
+  const forecast = getMonthlyForecast(plannedExpenses, creditCards, creditCardExpenses);
   const profileRank = getProfileRank(profile);
   const isMasterProfile = profile === 'mestre';
   const initialProfileRank = onboarding.initialProfile ? getProfileRank(onboarding.initialProfile) : profileRank;
@@ -149,6 +151,7 @@ export function Dashboard() {
                 <EntradasSaidasCard
                   receitas={receitas}
                   despesas={despesas}
+                  previsto={forecast.total}
                   mesNome={getMonthName()}
                   icon={Icon}
                   title={meta.title}
@@ -158,6 +161,7 @@ export function Dashboard() {
                   onMoveDown={() => moveCard(index, 1)}
                   canEdit={true}
                   onNavigate={(filter) => navigate('/gastos', { state: { filter } })}
+                  onForecast={() => navigate('/previsoes')}
                   onCardClick={() => navigate('/gastos')}
                 />
               )}
@@ -353,7 +357,7 @@ function SaldoTotalCard({ saldo, accounts, investments, icon: Icon }: { saldo: n
   );
 }
 
-function EntradasSaidasCard(props: { receitas: number; despesas: number; mesNome: string; icon: LucideIcon; title: string; editing: boolean; onToggle: () => void; onMoveUp?: () => void; onMoveDown?: () => void; canEdit: boolean; onNavigate: (filter: 'receita' | 'despesa') => void; onCardClick: () => void }) {
+function EntradasSaidasCard(props: { receitas: number; despesas: number; previsto: number; mesNome: string; icon: LucideIcon; title: string; editing: boolean; onToggle: () => void; onMoveUp?: () => void; onMoveDown?: () => void; canEdit: boolean; onNavigate: (filter: 'receita' | 'despesa') => void; onForecast: () => void; onCardClick: () => void }) {
   return (
     <div role="button" tabIndex={0} onClick={props.onCardClick} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') props.onCardClick(); }} className="cursor-pointer">
     <CardShell icon={props.icon} title={props.mesNome} editing={props.editing} onToggle={props.onToggle} onMoveUp={props.onMoveUp} onMoveDown={props.onMoveDown} canEdit={props.canEdit}>
@@ -371,6 +375,11 @@ function EntradasSaidasCard(props: { receitas: number; despesas: number; mesNome
             <span className="text-xs font-medium text-danger">Saídas</span>
           </div>
           <p className="text-lg font-bold text-danger">{formatCurrency(props.despesas)}</p>
+        </button>
+        <button type="button" onClick={(event) => { event.stopPropagation(); props.onForecast(); }} className="order-3 p-3 bg-amber-50 rounded-xl text-left transition-colors hover:bg-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-200">
+          <div className="flex items-center gap-1.5 mb-1"><Icons.CalendarClock className="w-4 h-4 text-amber-600" /><span className="text-xs font-medium text-amber-700">Previsto</span></div>
+          <p className="text-lg font-bold text-amber-700">{formatCurrency(props.previsto)}</p>
+          <p className="text-[10px] text-amber-700/80 mt-1">Ver previsões do mês</p>
         </button>
       </div>
     </CardShell>

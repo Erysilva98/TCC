@@ -49,6 +49,7 @@ export const PROFILES: Record<ProfileType, ProfileConfig> = {
     menu: [
       { label: 'Início', path: '/dashboard', icon: 'Home' },
       { label: 'Gastos', path: '/gastos', icon: 'Wallet' },
+      { label: 'Previsões', path: '/previsoes', icon: 'CalendarClock' },
       { label: 'Aprender', path: '/aprender', icon: 'GraduationCap' },
       { label: 'Perfil', path: '/perfil', icon: 'User' },
     ],
@@ -74,6 +75,7 @@ export const PROFILES: Record<ProfileType, ProfileConfig> = {
     menu: [
       { label: 'Início', path: '/dashboard', icon: 'Home' },
       { label: 'Gastos', path: '/gastos', icon: 'Wallet' },
+      { label: 'Previsões', path: '/previsoes', icon: 'CalendarClock' },
       { label: 'Contas', path: '/contas', icon: 'CreditCard' },
       { label: 'Metas', path: '/metas', icon: 'Target' },
       { label: 'Aprender', path: '/aprender', icon: 'GraduationCap' },
@@ -101,6 +103,7 @@ export const PROFILES: Record<ProfileType, ProfileConfig> = {
     menu: [
       { label: 'Início', path: '/dashboard', icon: 'Home' },
       { label: 'Gastos', path: '/gastos', icon: 'Wallet' },
+      { label: 'Previsões', path: '/previsoes', icon: 'CalendarClock' },
       { label: 'Contas', path: '/contas', icon: 'CreditCard' },
       { label: 'Metas', path: '/metas', icon: 'Target' },
       { label: 'Aprender', path: '/aprender', icon: 'GraduationCap' },
@@ -128,6 +131,7 @@ export const PROFILES: Record<ProfileType, ProfileConfig> = {
     menu: [
       { label: 'Início', path: '/dashboard', icon: 'Home' },
       { label: 'Gastos', path: '/gastos', icon: 'Wallet' },
+      { label: 'Previsões', path: '/previsoes', icon: 'CalendarClock' },
       { label: 'Análises', path: '/analises', icon: 'BarChart3' },
       { label: 'Investimentos', path: '/investimentos', icon: 'PiggyBank' },
       { label: 'Contas', path: '/contas', icon: 'CreditCard' },
@@ -156,6 +160,7 @@ export const PROFILES: Record<ProfileType, ProfileConfig> = {
     menu: [
       { label: 'Início', path: '/dashboard', icon: 'Home' },
       { label: 'Gastos', path: '/gastos', icon: 'Wallet' },
+      { label: 'Previsões', path: '/previsoes', icon: 'CalendarClock' },
       { label: 'Análises', path: '/analises', icon: 'BarChart3' },
       { label: 'Investimentos', path: '/investimentos', icon: 'PiggyBank' },
       { label: 'Contas', path: '/contas', icon: 'CreditCard' },
